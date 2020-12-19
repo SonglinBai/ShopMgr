@@ -1,10 +1,21 @@
 package com.bais1.domain;
 
-public class Supplier {
+import java.io.Serializable;
+
+public class Supplier implements Serializable {
     private String supplierId;
     private String supplierName;
     private String address;
     private String phone;
+
+    public Supplier(String supplierId, String name) {
+        this.supplierId = supplierId;
+        this.supplierName = name;
+    }
+
+    public Supplier() {
+
+    }
 
     @Override
     public String toString() {
@@ -14,13 +25,6 @@ public class Supplier {
                 ", address='" + address + '\'' +
                 ", phone='" + phone + '\'' +
                 '}';
-    }
-
-    public Supplier(String supplierId, String supplierName, String address, String phone) {
-        this.supplierId = supplierId;
-        this.supplierName = supplierName;
-        this.address = address;
-        this.phone = phone;
     }
 
     public String getSupplierId() {
@@ -52,6 +56,13 @@ public class Supplier {
     }
 
     public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public Supplier(String supplierId, String supplierName, String address, String phone) {
+        this.supplierId = supplierId;
+        this.supplierName = supplierName;
+        this.address = address;
         this.phone = phone;
     }
 }

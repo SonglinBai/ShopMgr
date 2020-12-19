@@ -10,7 +10,7 @@ public class Good implements Serializable {
     private float purchasePrice;
     private int inventory;
     private String supplierId;
-    private boolean isEnable;
+    private GoodStatus status;
     private String description;
 
     private Category category;
@@ -24,13 +24,13 @@ public class Good implements Serializable {
         this.goodName = goodName;
     }
 
-    public Good(String goodId, String goodName, String categoryId, boolean enable, String description, Category category) {
+    public Good(String goodId, String goodName, String categoryId,  String supplierId, GoodStatus status, String description) {
         this.goodId = goodId;
         this.goodName = goodName;
         this.categoryId = categoryId;
-        this.isEnable = enable;
+        this.supplierId = supplierId;
+        this.status = status;
         this.description = description;
-        this.category = category;
     }
 
     @Override
@@ -43,25 +43,11 @@ public class Good implements Serializable {
                 ", purchasePrice=" + purchasePrice +
                 ", inventory=" + inventory +
                 ", supplierId='" + supplierId + '\'' +
-                ", isEnable=" + isEnable +
+                ", status=" + status +
                 ", description='" + description + '\'' +
                 ", category=" + category +
                 ", supplier=" + supplier +
                 '}';
-    }
-
-    public Good(String goodId, String goodName, String categoryId, float retailPrice, float purchasePrice, int inventory, String supplierId, boolean isEnable, String description, Category category, Supplier supplier) {
-        this.goodId = goodId;
-        this.goodName = goodName;
-        this.categoryId = categoryId;
-        this.retailPrice = retailPrice;
-        this.purchasePrice = purchasePrice;
-        this.inventory = inventory;
-        this.supplierId = supplierId;
-        this.isEnable = isEnable;
-        this.description = description;
-        this.category = category;
-        this.supplier = supplier;
     }
 
     public String getGoodId() {
@@ -120,12 +106,12 @@ public class Good implements Serializable {
         this.supplierId = supplierId;
     }
 
-    public boolean isEnable() {
-        return isEnable;
+    public GoodStatus getStatus() {
+        return status;
     }
 
-    public void setEnable(boolean enable) {
-        isEnable = enable;
+    public void setStatus(GoodStatus status) {
+        this.status = status;
     }
 
     public String getDescription() {

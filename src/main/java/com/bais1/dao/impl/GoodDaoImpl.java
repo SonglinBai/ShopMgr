@@ -14,19 +14,27 @@ public class GoodDaoImpl implements GoodDao {
     private JdbcTemplate template = new JdbcTemplate(JDBCUtils.getDataSource());
 
     @Override
-    public int getTotalCount(String categoryId, String goodName) {
+    public int getTotalCount(String goodId, String goodName, String categoryId, String supplierId) {
         String sql = "select count(*) from tb_good where 1=1 ";
         //用于拼接查询语句
         StringBuilder stringBuilder = new StringBuilder(sql);
         //用于存储参数信息
         ArrayList params = new ArrayList<>();
 
-        if (!categoryId.equals("0")) {
-            stringBuilder.append(" and category = ? ");
+        if (goodId!=null && goodId.length()>0) {
+            stringBuilder.append(" and goodId like ? ");
+            params.add("%" + goodId + "%");
+        }
+        if (supplierId!=null && supplierId.length()>0) {
+            stringBuilder.append(" and supplierId = ? ");
+            params.add(supplierId);
+        }
+        if (categoryId!=null && categoryId.length()>0) {
+            stringBuilder.append(" and categoryId = ? ");
             params.add(categoryId);
         }
-        if (goodName != null && goodName.length() > 0) {
-            stringBuilder.append(" and name like ?");
+        if (goodName != null && goodName.length()>0) {
+            stringBuilder.append(" and goodName like ?");
             params.add("%" + goodName + "%");
         }
         sql = stringBuilder.toString();
@@ -34,19 +42,27 @@ public class GoodDaoImpl implements GoodDao {
     }
 
     @Override
-    public List<Good> getByPage(String categoryId, String goodName, int start, int pageSize) {
+    public List<Good> getByPage(String goodId, String goodName, String categoryId, String supplierId, int start, int pageSize) {
         String sql = "select * from tb_good where 1=1 ";
         //用于拼接查询语句
         StringBuilder stringBuilder = new StringBuilder(sql);
         //用于存储参数信息
         ArrayList params = new ArrayList<>();
 
-        if (!categoryId.equals("0")) {
-            stringBuilder.append(" and category = ? ");
+        if (goodId!=null && goodId.length()>0) {
+            stringBuilder.append(" and goodId like ? ");
+            params.add("%" + goodId + "%");
+        }
+        if (supplierId!=null && supplierId.length()>0) {
+            stringBuilder.append(" and supplierId = ? ");
+            params.add(supplierId);
+        }
+        if (categoryId!=null && categoryId.length()>0) {
+            stringBuilder.append(" and categoryId = ? ");
             params.add(categoryId);
         }
-        if (goodName != null && goodName.length() > 0) {
-            stringBuilder.append(" and name like ?");
+        if (goodName != null && goodName.length()>0) {
+            stringBuilder.append(" and goodName like ?");
             params.add("%" + goodName + "%");
         }
         stringBuilder.append(" limit ?,?");
@@ -59,10 +75,10 @@ public class GoodDaoImpl implements GoodDao {
 
     @Override
     public boolean edit(String goodId, Good good) {
-        String sql = "update tb_good set goodId=?,goodName=?,categoryId=?,description=? where goodId=?";
+        String sql = "update tb_good set goodId=?,goodName=?,categoryId=?, supplierId=?, description=? where goodId=?";
 
         try {
-            template.update(sql, good.getGoodId(), good.getGoodName(), good.getCategory(), good.getDescription(), goodId);
+            template.update(sql, good.getGoodId(), good.getGoodName(), good.getCategoryId(), good.getSupplierId(), good.getDescription(), goodId);
         } catch (DataAccessException e) {
             return false;
         }
@@ -123,7 +139,7 @@ public class GoodDaoImpl implements GoodDao {
         StringBuilder stringBuilder = new StringBuilder(sql);
         ArrayList params = new ArrayList<>();
         for (String gid : gids) {
-            stringBuilder.append(" or gid=?");
+            stringBuilder.append(" or goodId=?");
             params.add(gid);
         }
         sql = stringBuilder.toString();

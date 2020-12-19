@@ -42,6 +42,7 @@ public class UserDaoImpl implements UserDao {
             System.out.println(userAccount + "登录失败");
             return null;
         }
+        System.out.println(user);
         return user;
     }
 
@@ -49,7 +50,7 @@ public class UserDaoImpl implements UserDao {
     public boolean save(User user) {
         try {
             //1.定义sql
-            String sql = "insert into tb_user(userAccount, passwd, userName ,gender, email, userRole,isEnable, activeCode) VALUES (?,?,?,?,?,?,?,?)";
+            String sql = "insert into tb_user(userAccount, passwd, userName ,gender, email, userRole,status, activeCode) VALUES (?,?,?,?,?,?,?,?)";
             template.update(sql,
                     user.getUserAccount(),
                     user.getPasswd(),
@@ -70,7 +71,7 @@ public class UserDaoImpl implements UserDao {
     @Override
     public boolean enable(User user) {
         try {
-            String sql = "update tb_user set isEnable=1 where userAccount=?";
+            String sql = "update tb_user set status=1 where userAccount=?";
             template.update(sql, user.getUserAccount());
         } catch (Exception e) {
             System.out.println(user.getUserAccount()+ "激活失败");

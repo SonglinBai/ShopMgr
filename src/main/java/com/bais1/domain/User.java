@@ -10,7 +10,7 @@ public class User implements Serializable {
     private Gender gender;//GB2261-80国标代码 0、未知，1、男，2、女，3、女改男，4、男改女，5、其他
     private String email;
     private UserRole userRole;
-    private boolean isEnable;
+    private UserStatus status;
     private String activeCode;
 
     public User(String userAccount, String userName) {
@@ -32,21 +32,9 @@ public class User implements Serializable {
                 ", gender=" + gender +
                 ", email='" + email + '\'' +
                 ", userRole=" + userRole +
-                ", isEnable=" + isEnable +
+                ", status=" + status +
                 ", activeCode='" + activeCode + '\'' +
                 '}';
-    }
-
-    public User(String userAccount, String passwd, String userName, int age, Gender gender, String email, UserRole userRole, boolean isEnable, String activeCode) {
-        this.userAccount = userAccount;
-        this.passwd = passwd;
-        this.userName = userName;
-        this.age = age;
-        this.gender = gender;
-        this.email = email;
-        this.userRole = userRole;
-        this.isEnable = isEnable;
-        this.activeCode = activeCode;
     }
 
     public String getUserAccount() {
@@ -105,12 +93,12 @@ public class User implements Serializable {
         this.userRole = userRole;
     }
 
-    public boolean isEnable() {
-        return isEnable;
+    public UserStatus getStatus() {
+        return status;
     }
 
-    public void setEnable(boolean enable) {
-        isEnable = enable;
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 
     public String getActiveCode() {

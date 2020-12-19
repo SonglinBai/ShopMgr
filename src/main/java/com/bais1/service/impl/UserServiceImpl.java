@@ -3,6 +3,7 @@ package com.bais1.service.impl;
 import com.bais1.dao.UserDao;
 import com.bais1.dao.impl.UserDaoImpl;
 import com.bais1.domain.User;
+import com.bais1.domain.UserStatus;
 import com.bais1.service.UserService;
 import com.bais1.util.MailUtils;
 import com.bais1.util.UuidUtil;
@@ -29,7 +30,7 @@ public class UserServiceImpl implements UserService {
         //2.1设置激活码，唯一字符串
         user.setActiveCode(UuidUtil.getUuid());
         //2.2设置激活状态
-        user.setEnable(false);
+        user.setStatus(UserStatus.UNACTIVATED);
         userDao.save(user);
 
         //3.激活邮件发送，邮件正文

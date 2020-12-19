@@ -1,9 +1,6 @@
 package com.bais1.web.servlet;
 
-import com.bais1.domain.DocumentType;
-import com.bais1.domain.ResultInfo;
-import com.bais1.domain.User;
-import com.bais1.domain.UserRole;
+import com.bais1.domain.*;
 import com.bais1.service.UserService;
 import com.bais1.service.impl.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -112,22 +109,22 @@ public class UserServlet extends BaseServlet {
             info.setErrorMsg("用户名密码或错误");
         }
         //6.判断登录成功
-        else if (u.isEnable()) {
+        else if (u.getStatus().equals(UserStatus.ENABLE)) {
             request.getSession().setAttribute("user", u);//登录成功标记
             //登录成功
             info.setFlag(true);
         }
         //5.判断用户是否激活
-        else if (!u.isEnable()) {
+        else if (!u.getStatus().equals(UserStatus.UNACTIVATED)) {
             //用户尚未激活
             info.setFlag(false);
             info.setErrorMsg("您的账号尚未激活，请激活");
         }
-//        //判断用户是否被禁用
-//        else if (u.getStatus() == 200) {
-//            info.setFlag(false);
-//            info.setErrorMsg("你的账号被禁用,请联系你的账号管理员");
-//        }
+        //判断用户是否被禁用
+        else if (u.getStatus().equals(UserStatus.DISABLE)) {
+            info.setFlag(false);
+            info.setErrorMsg("你的账号被禁用,请联系你的账号管理员");
+        }
 
         //响应数据
         this.writeValue(info, response);
@@ -205,7 +202,7 @@ public class UserServlet extends BaseServlet {
 
         User user = new User();
         user.setUserRole(u.getUserRole());
-        user.setEnable(u.isEnable());
+        user.setStatus(u.getStatus());
         user.setActiveCode(u.getActiveCode());
         ResultInfo info = new ResultInfo();
         try {

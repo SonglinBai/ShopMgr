@@ -20,20 +20,31 @@
     <div class="tool-container">
         <form class="form-inline" action="javascript:void(0)">
             <div class="form-group">
+                <label for="inputGname">商品编号</label>
+                <input type="text" class="form-control" id="inputGid" placeholder="商品ID">
+            </div>
+            <div class="form-group">
                 <label for="inputGname">商品名</label>
-                <input type="text" class="form-control" id="inputGname" placeholder="name">
+                <input type="text" class="form-control" id="inputGname" placeholder="商品名">
             </div>
             <div class="form-group">
                 <label for="selectCatagory">分类</label>
                 <select class="form-control" id="selectCatagory">
                 </select>
             </div>
+            <div class="form-group">
+                <label for="selectSupplier">供应商</label>
+                <select class="form-control" id="selectSupplier">
+                </select>
+            </div>
             <button class="btn btn-default" onclick="javascript:search()">查询</button>
-            <div style="display: inline;margin-left: 80px;">
+            <div style="display: inline;">
                 <button type="button" class="btn btn-primary" onclick="newGood()">新建</button>
                 <button type="button" class="btn btn-danger" onclick="deleteSelected()">删除选中</button>
+<!--
                 <button type="button" class="btn btn-default" onclick="exportGood()">出库</button>
                 <button type="button" class="btn btn-default" onclick="importGood()">入库</button>
+-->
             </div>
         </form>
     </div>
@@ -45,6 +56,7 @@
                 <th>商品ID</th>
                 <th>商品名</th>
                 <th>分类</th>
+                <th>供应商</th>
                 <th>数量</th>
                 <th>描述</th>
                 <th>操作</th>
@@ -105,6 +117,13 @@
                             </select>
                         </div>
                         <div class="form-group">
+                            <label for="edit-supplier">供应商</label>
+                            <select id="edit-supplier" class="form-control">
+
+                            </select>
+                        </div>
+
+                        <div class="form-group">
                             <label for="edit-inputDescription">描述</label>
                             <textarea class="form-control" placeholder="description"
                                       id="edit-inputDescription"></textarea>
@@ -135,6 +154,7 @@
                             <th>商品ID</th>
                             <th>商品名</th>
                             <th>分类</th>
+                            <th>供应商</th>
                             <th>库存数量</th>
                             <th id="im-or-ex"></th>
                         </tr>
@@ -161,12 +181,14 @@
 <script type="application/javascript">
     $(function () {
         //获取请求的cid，gname
-        var cid = getParameter("cid");
-        var gname = getParameter("gname");
+        var goodId = getParameter("goodId")
+        var categoryId = getParameter("categoryId");
+        var goodName = getParameter("goodName");
+        var supplierId = getParameter("supplierId");
         var currentPage = getParameter("currentPage");
 
-        if (gname) {
-            gname = window.decodeURIComponent(gname);
+        if (goodName) {
+            goodName = window.decodeURIComponent(goodName);
         }
 
         $.get("/category/getAll", {}, function (data) {
@@ -174,15 +196,27 @@
             var ct;
             for (var i = 0; i < data.length; i++) {
                 ct = data[i];
-                option = '<option value="' + ct.cid + '">' + ct.name + '</option>'
+                option = '<option value="' + ct.categoryId + '">' + ct.categoryName + '</option>'
                 options += option;
             }
 
             $("#selectCatagory").html(options);
         })
 
+        $.get("/supplier/getAll",{}, function (data) {
+            var options = '<option selected value="0">全部</option>';
+            var supplier;
+            for (var i = 0; i < data.length; i++) {
+                supplier = data[i];
+                option = '<option value="' + supplier.supplierId + '">' + supplier.supplierName + '</option>';
+                options += option;
+            }
+            $("#selectSupplier").html(options);
+        })
 
-        load(cid, gname, currentPage);
+
+        // load(cid, gname, currentPage);
+        load(goodId, goodName, categoryId, supplierId, currentPage);
     });
 
     $(function () {
@@ -192,10 +226,10 @@
         });
     })
 
-    function load(cid, gname, currentPage) {
+    function load(goodId, goodName, categoryId, supplierId, currentPage) {
         $("#checkAll").prop('checked', false);
         //发送ajax请求
-        $.get("good/pageQuery", {cid: cid, gname: gname, currentPage: currentPage}, function (pb) {
+        $.get("good/pageQuery", {"goodId": goodId, "goodName": goodName, "categoryId": categoryId, "supplierId":supplierId, "currentPage": currentPage}, function (pb) {
                 //设置总页数和总记录数
                 $("#totalPage").html(pb.totalPage);
                 $("#totalCount").html(pb.totalCount);
@@ -203,7 +237,7 @@
                 //设置分页条
                 var lis = "";
 
-                var fristPage = '<li onclick="javascipt:load(' + cid + ',' + gname + ',\'' + 1 + '\')"><a href="javascript:void(0)">首页</a></li>';
+                var fristPage = '<li onclick="javascipt:load(' + goodId + ',' + goodName + ',' + categoryId + ',' + supplierId + ',' + 1 + ')"><a href="javascript:void(0)">首页</a></li>';
 
                 //计算上一页的页码
                 var beforeNum = pb.currentPage - 1;
@@ -211,7 +245,7 @@
                     beforeNum = 1;
                 }
 
-                var beforePage = '<li  onclick="javascipt:load(' + cid + ',' + gname + ',\'' + beforeNum + '\')"><a href="javascript:void(0)">&ll;</a></li>';
+                var beforePage = '<li  onclick="javascipt:load(' + goodId + ',' + goodName + ',' + categoryId + ',' + supplierId + ',' + beforeNum + ')"><a href="javascript:void(0)">&ll;</a></li>';
 
                 lis += fristPage;
                 lis += beforePage;
@@ -258,16 +292,16 @@
                     //判断当前页码是否等于i
                     if (pb.currentPage == i) {
 
-                        li = '<li class="active" onclick="javascipt:load(' + cid + ',' + gname + ',' + i + ')"><a href="javascript:void(0)">' + i + '</a></li>';
+                        li = '<li class="active" onclick="javascipt:load(' + goodId + ',' + goodName + ',' + categoryId + ',' + supplierId + ',' + i + ')"><a href="javascript:void(0)">' + i + '</a></li>';
 
                     } else {
                         //创建页码的li
-                        li = '<li onclick="javascipt:load(' + cid + ',' + gname + ',' + i + ')"><a href="javascript:void(0)">' + i + '</a></li>';
+                        li = '<li onclick="javascipt:load(' + goodId + ',' + goodName + ',' + categoryId + ',' + supplierId + ',' + i + ')"><a href="javascript:void(0)">' + i + '</a></li>';
                     }
                     //拼接字符串
                     lis += li;
                 }
-                var lastPage = '<li onclick="javascipt:load(' + cid + ',' + gname + ',' + pb.totalPage + ')"><a href="javascript:void(0)">末页</a></li>';
+                var lastPage = '<li onclick="javascipt:load(' + goodId + ',' + goodName + ',' + categoryId + ',' + supplierId + ',' + pb.totalPage + ')"><a href="javascript:void(0)">末页</a></li>';
 
                 //计算下一页的页码
                 var nextNum = pb.currentPage + 1;
@@ -275,7 +309,7 @@
                     nextNum = pb.totalPage;
                 }
 
-                var nextPage = '<li  onclick="javascipt:load(' + cid + ',' + gname + ',' + nextNum + ')"><a href="javascript:void(0)">&gg;</a></li>';
+                var nextPage = '<li  onclick="javascipt:load(' + goodId + ',' + goodName + ',' + categoryId + ',' + supplierId + ',' + nextNum + ')"><a href="javascript:void(0)">&gg;</a></li>';
 
                 lis += nextPage;
                 lis += lastPage;
@@ -287,19 +321,29 @@
                 var trs = "";
                 for (var i = 0; i < pb.list.length; i++) {
                     var good = pb.list[i];
-
+                    if (good.category==null){
+                        ctname = '未分类';
+                    } else {
+                        ctname = good.category.categoryName;
+                    }
+                    if (good.supplier==null) {
+                        spname = '未指定';
+                    } else {
+                        spname = good.supplier.supplierName;
+                    }
                     var tr = '        <tr>\n' +
-                        '                <td><input name="gid" class="checkbox check" type="checkbox" value="' + good.gid + '"></td>\n' +
-                        '                <td>' + good.gid + '</td>' +
-                        '                <td>' + good.name + '</td>\n' +
-                        '                <td>' + good.ct.name + '</td>\n' +
-                        '                <td>' + good.amount + '</td>\n' +
+                        '                <td><input name="gid" class="checkbox check" type="checkbox" value="' + good.goodId + '"></td>\n' +
+                        '                <td>' + good.goodId + '</td>' +
+                        '                <td>' + good.goodName + '</td>\n' +
+                        '                <td>' + ctname + '</td>\n' +
+                        '                <td>' + spname + '</td>\n' +
+                        '                <td>' + good.inventory + '</td>\n' +
                         '                <td>' + good.description + '</td>\n' +
                         '                <td>\n' +
-                        '                    <button type="button" class="btn btn-default btn-xs" onclick="editGood(' + good.gid + ')">\n' +
+                        '                    <button type="button" class="btn btn-default btn-xs" onclick="editGood(\'' + good.goodId + '\')">\n' +
                         '                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>\n' +
                         '                    </button>\n' +
-                        '                    <button type="button" class="btn btn-default btn-xs" onclick="removeGood(' + good.gid + ')">\n' +
+                        '                    <button type="button" class="btn btn-default btn-xs" onclick="removeGood(\'' + good.goodId + '\')">\n' +
                         '                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>\n' +
                         '                    </button>\n' +
                         '                </td>\n' +
@@ -315,27 +359,43 @@
         $("#edit-title").html("商品信息编辑");
         $("#edit-submit").off('click').click(submitEdit);
         $.get("/good/getById", {gid: gid}, function (data) {
-            category = data.category;
+            var categoryId = data.categoryId;
+            var supplierId = data.supplierId;
             $("#ogid").html(gid);
-            $("#edit-inputGid").val(data.gid);
-            $("#edit-inputGname").val(data.name);
+            $("#edit-inputGid").val(data.goodId);
+            $("#edit-inputGname").val(data.goodName);
             $("#edit-inputDescription").val(data.description);
             $.get("/category/getAll", {}, function (data) {
                 var options = '';
                 var ct;
                 for (var i = 0; i < data.length; i++) {
                     ct = data[i];
-                    if (ct.cid == category) {
-                        option = '<option selected value="' + ct.cid + '">' + ct.name + '</option>'
+                    if (ct.categoryId == categoryId) {
+                        option = '<option selected value="' + ct.categoryId + '">' + ct.categoryName + '</option>'
                     } else {
-                        option = '<option value="' + ct.cid + '">' + ct.name + '</option>'
+                        option = '<option value="' + ct.categoryId + '">' + ct.categoryName + '</option>'
                     }
                     options += option;
                 }
 
                 $("#edit-category").html(options);
-                $("#edit-modal").modal('show');
             });
+            $.get("/supplier/getAll", {}, function (data) {
+                var options = '';
+                var supplier;
+                for (var i = 0; i< data.length; i++) {
+                    supplier = data[i];
+                    if (supplier.supplierId == supplierId) {
+                        option = '<option selected value="' + supplier.supplierId + '">' + supplier.supplierName + '</option>'
+                    } else {
+                        option = '<option value="' + supplier.supplierId + '">' + supplier.supplierName + '</option>'
+                    }
+                    options += option;
+                }
+
+                $("#edit-supplier").html(options);
+            });
+            $("#edit-modal").modal('show');
         });
     }
 
@@ -344,10 +404,11 @@
         var ogid = $("#ogid").html();
         var gid = $("#edit-inputGid").val();
         var cid = $("#edit-category").val();
+        var supplierId = $("#edit-supplier").val();
         var name = $("#edit-inputGname").val();
         var description = $("#edit-inputDescription").val();
 
-        $.get("/good/edit", {ogid: ogid, gid: gid, cid: cid, name: name, description: description}, function (data) {
+        $.get("/good/edit", {'ogid': ogid, 'gid': gid, 'cid': cid, 'name': name, 'supplierId':supplierId, 'description': description}, function (data) {
             $("#edit-modal").modal('hide');
             load();
         });
@@ -379,16 +440,25 @@
     }
 
     function search() {
-        var gname = $("#inputGname").val();
-        var cid = $("#selectCatagory").val();
+        var goodName = $("#inputGname").val();
+        var goodId = $("#inputGid").val();
+        var supplierId = $("#selectSupplier").val();
+        var categoryId = $("#selectCatagory").val();
 
-        if (gname.length == 0) {
-            gname = null;
+        if (goodName.length == 0) {
+            goodName = null;
         }
-        if (cid.length == 0) {
-            cid = null;
+        if (categoryId == 0) {
+            categoryId = null;
         }
-        load(cid, gname, 1);
+        if (supplierId==0) {
+            supplierId = null;
+        }
+        if (goodId.length == 0) {
+            goodId = null;
+        }
+
+        load(goodId, goodName, categoryId, supplierId, 1);
     }
 
     function newGood() {
@@ -398,22 +468,33 @@
         $("#edit-inputDescription").val("");
         $("#edit-submit").off('click').click(submitNew);
 
-        $.get("/good/getNextId", {}, function (data) {
-            $("#edit-inputGid").val(data);
-        });
+        // $.get("/good/getNextId", {}, function (data) {
+        //     $("#edit-inputGid").val(data);
+        // });
         $.get("/category/getAll", {}, function (data) {
             var options = '';
             var ct;
             for (var i = 0; i < data.length; i++) {
                 ct = data[i];
-                option = '<option value="' + ct.cid + '">' + ct.name + '</option>'
+                option = '<option value="' + ct.categoryId + '">' + ct.categoryName + '</option>'
                 options += option;
             }
 
             $("#edit-category").html(options);
-            $("#edit-modal").modal('show');
+        });
+        $.get("/supplier/getAll", {}, function (data) {
+            var options = '';
+            var supplier;
+            for (var i = 0; i < data.length; i++) {
+                supplier = data[i];
+                option = '<option value="' + supplier.supplierId + '">' + supplier.supplierName + '</option>'
+                options += option;
+            }
+
+            $("#edit-supplier").html(options);
         });
 
+        $("#edit-modal").modal('show');
     }
 
     function submitNew() {
@@ -421,9 +502,10 @@
         var gid = $("#edit-inputGid").val();
         var cid = $("#edit-category").val();
         var name = $("#edit-inputGname").val();
+        var supplierId = $("edit-supplier").val();
         var description = $("#edit-inputDescription").val();
 
-        $.get("/good/create", {gid: gid, name: name, cid: cid, description: description}, function (data) {
+        $.get("/good/create", {'gid': gid, 'name': name, 'cid': cid, 'supplierId':supplierId, 'description': description}, function (data) {
             if (data.flag) {
                 load();
                 $("#edit-modal").modal('hide');
@@ -467,8 +549,8 @@
                 var good = data[i];
 
                 var tr = '                        <tr>\n' +
-                    '                            <td>' + good.gid + '</td>\n' +
-                    '                            <td>' + good.name + '</td>\n' +
+                    '                            <td>' + good.goodId + '</td>\n' +
+                    '                            <td>' + good.goodName + '</td>\n' +
                     '                            <td>' + good.ct.name + '</td>\n' +
                     '                            <td>' + good.amount + '</td>\n' +
                     '                            <td style="width: 80px"><input type="number" name="' + good.gid + '" class="form-control"></td>\n' +

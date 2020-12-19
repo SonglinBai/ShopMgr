@@ -23,18 +23,18 @@ public class GoodServiceImpl implements GoodService {
     DocumentDao documentDao = new DocumentDaoImpl();
 
     @Override
-    public PageBean<Good> pageQuery(String categoryId, String goodName, int currentPage, int pageSize) {
+    public PageBean<Good> pageQuery(String goodId, String goodName, String categoryId, String supplierId, int currentPage, int pageSize) {
         PageBean<Good> pb = new PageBean<Good>();
 
         pb.setCurrentPage(currentPage);
         pb.setPageSize(pageSize);
 
-        int totalCount = goodDao.getTotalCount(categoryId, goodName);
+        int totalCount = goodDao.getTotalCount(goodId, goodName, categoryId, supplierId);
         pb.setTotalCount(totalCount);
 
         int start = (currentPage - 1) * pageSize;
 
-        List<Good> list = goodDao.getByPage(categoryId, goodName, start, pageSize);
+        List<Good> list = goodDao.getByPage(goodId, goodName, categoryId, supplierId, start, pageSize);
 //        for (Good good : list) {
 //            good.setCt(categoryDao.getById(good.getCategory()));
 //        }

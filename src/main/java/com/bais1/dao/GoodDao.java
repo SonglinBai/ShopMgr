@@ -12,7 +12,7 @@ public interface GoodDao {
      * @param categoryId
      * @return
      */
-    int getTotalCount(String categoryId, String goodName);
+    int getTotalCount(String goodId, String goodName, String categoryId, String supplierId);
 
     /**d
      * 根据cid查询一页的信息
@@ -21,7 +21,7 @@ public interface GoodDao {
      * @param pageSize
      * @return
      */
-    List<Good> getByPage(String categoryId, String goodName,int start, int pageSize);
+    List<Good> getByPage(String goodId, String goodName, String categoryId, String supplierId,int start, int pageSize);
 
     boolean edit(String goodId,Good good);
 

@@ -37,6 +37,7 @@ public class CategoryDaoImpl implements CategoryDao {
         try {
             template.update(sql,categoryId,name,description);
         } catch (DataAccessException e) {
+            e.printStackTrace();
             return false;
         }
         return true;
@@ -48,6 +49,7 @@ public class CategoryDaoImpl implements CategoryDao {
         try {
             template.update(sql,categoryId,name,description,oldCategoryId);
         } catch (DataAccessException e) {
+            e.printStackTrace();
             return false;
         }
         return true;

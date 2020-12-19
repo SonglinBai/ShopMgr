@@ -17,7 +17,7 @@
 
 <div class="main-container">
     <div id="errorMsg" class="alert alert-danger" role="alert" style="display: none;"></div>
-    <div id="catagory-list">
+    <div id="category-list-container">
         <div class="list-group" id="category-list">
         </div>
         <div id="new_delete">
@@ -25,7 +25,7 @@
             <button id="cat_delete" class="btn btn-default btn-sm"><span>&minus;</span></button>
         </div>
     </div>
-    <div id="catagory-edit">
+    <div id="category-edit">
         <form class="form-horizontal" id="edit-form" action="javascript:void(0)">
             <span id="ocid" style="display: none"></span>
             <div style="text-align: center"><h1 id="category-title">分类编辑</h1></div>
@@ -44,7 +44,7 @@
                 </div>
 
                 <div>
-                    <button id="catagory-submit" type="submit" class="btn btn-default" onclick="javascript:void(0)">提交</button>
+                    <button id="category-submit" type="submit" class="btn btn-default" onclick="javascript:void(0)">提交</button>
                 </div>
             </div>
         </form>
@@ -76,7 +76,7 @@
             inputDescription.val('');
             ocid.html('');
             //为提交按钮绑定点击进行新建操作
-            $("#catagory-submit").off('click').click(function () {
+            $("#category-submit").off('click').click(function () {
                 $.get("/category/create",{cid:inputCid.val(),name:inputCname.val(),description:inputDescription.val()},function (data) {
                     if(data.flag){
                         load();
@@ -105,7 +105,7 @@
         $.get("/category/getAll", {}, function (data) {
             var lis = '';
             for (var i = 0; i < data.length; i++) {
-                li = '<a href="javascript:formEdit('+data[i].cid+','+i+')" class="list-group-item">'+data[i].cid+':'+data[i].name+'</a>\n';
+                li = '<a href="javascript:formEdit(\''+data[i].categoryId+'\','+i+')" class="list-group-item">'+data[i].categoryId+':'+data[i].categoryName+'</a>\n';
                 lis += li;
             }
             // lis += '<a href="javascript:formCreat()" style="text-align: center" class="list-group-item">&plus;</a>'
@@ -113,7 +113,7 @@
         });
     }
 
-    function formEdit(cid,count) {
+    function formEdit(categoryId,count) {
         hideErrorMsg();
         $("#category-list > a:not(:eq("+count+"))").removeClass("active");
         $("#category-list > a:eq("+count+")").addClass("active");
@@ -122,14 +122,14 @@
         var inputDescription = $("#inputDescription");
         var ocid = $("#ocid");
         $("#category-title").html("分类编辑");
-        $.get("/category/getById",{cid:cid},function (data) {
-            ocid.html(data.cid);
-            inputCid.val(data.cid);
-            inputCname.val(data.name);
+        $.get("/category/getById",{cid:categoryId},function (data) {
+            ocid.html(data.categoryId);
+            inputCid.val(data.categoryId);
+            inputCname.val(data.categoryName);
             inputDescription.val(data.description);
         });
         //为提交按钮绑定点击进行编辑操作
-        $("#catagory-submit").off('click').click(function () {
+        $("#category-submit").off('click').click(function () {
             $.get("/category/edit",{ocid:ocid.html(),cid:inputCid.val(),name:inputCname.val(),description:inputDescription.val()},function (data) {
                 if(data.flag){
                     load();

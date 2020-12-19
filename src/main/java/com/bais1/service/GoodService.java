@@ -9,7 +9,7 @@ import java.util.Map;
 
 public interface GoodService {
     //获取单页对象
-    PageBean<Good> pageQuery(String categoryId,String goodName, int currentPage,int pageSize);
+    PageBean<Good> pageQuery(String goodId, String goodName, String categoryId, String supplierId, int currentPage,int pageSize);
     //编辑
     boolean edit(String oldGoodId,Good good);
     //删除

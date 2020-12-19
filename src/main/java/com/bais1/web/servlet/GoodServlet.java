@@ -29,15 +29,10 @@ public class GoodServlet extends BaseServlet {
         //1.接受参数
         String currentPageStr = request.getParameter("currentPage");
         String pageSizeStr = request.getParameter("pageSize");
-        String cidStr = request.getParameter("cid");
-
-        //接受rname 线路名称
-        String gname = request.getParameter("gname");
-        if (gname == null) {
-            gname = "";
-        } else
-            gname = new String(gname.getBytes("iso-8859-1"), "utf-8");
-
+        String categoryId = request.getParameter("cid");
+        String supplierId = request.getParameter("supplierId");
+        String goodName = request.getParameter("gname");
+        String goodId = request.getParameter("goodId");
 
         int currentPage = 0;//当前页码，如果不传递，则默认为第一页
         if (currentPageStr != null && currentPageStr.length() > 0) {
@@ -45,7 +40,6 @@ public class GoodServlet extends BaseServlet {
         } else {
             currentPage = 1;
         }
-
         int pageSize = 0;//每页显示条数，如果不传递，默认每页显示5条记录
         if (pageSizeStr != null && pageSizeStr.length() > 0) {
             pageSize = Integer.parseInt(pageSizeStr);
@@ -54,7 +48,7 @@ public class GoodServlet extends BaseServlet {
         }
 
         //3. 调用service查询PageBean对象
-        PageBean<Good> pb = goodService.pageQuery(cidStr, gname, currentPage, pageSize);
+        PageBean<Good> pb = goodService.pageQuery(goodId, goodName, categoryId, supplierId, currentPage, pageSize);
 
         //4. 将pageBean对象序列化为json，返回
         writeValue(pb, response);
@@ -67,8 +61,9 @@ public class GoodServlet extends BaseServlet {
         String name = request.getParameter("name");
         String cidStr = request.getParameter("cid");
         String description = request.getParameter("description");
+        String supplierId = request.getParameter("supplierId");
 
-        Good good = new Good(gidStr, name, cidStr, true, description, new Category());
+        Good good = new Good(gidStr, name, cidStr, supplierId, GoodStatus.ENABLE, description);
         ResultInfo info = new ResultInfo();
         if (!ogidStr.equals(gidStr)&&goodService.isIdExist(good)) {
             info.setFlag(false);
@@ -137,17 +132,18 @@ public class GoodServlet extends BaseServlet {
         writeValue(good, response);
     }
 
-    public void getNextId(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        writeValue(goodService.getNextId(), response);
-    }
+//    public void getNextId(HttpServletRequest request, HttpServletResponse response) throws IOException {
+//        writeValue(goodService.getNextId(), response);
+//    }
 
     public void create(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String gidStr = request.getParameter("gid");
         String name = request.getParameter("name");
         String cidStr = request.getParameter("cid");
+        String supplierId = request.getParameter("supplierId");
         String description = request.getParameter("description");
 
-        Good good = new Good(gidStr, name, cidStr, true, description, new Category());
+        Good good = new Good(gidStr, name, cidStr, supplierId, GoodStatus.ENABLE, description);
         ResultInfo info = new ResultInfo();
         if (goodService.isIdExist(good)) {
             info.setFlag(false);
