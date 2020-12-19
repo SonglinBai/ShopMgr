@@ -34,7 +34,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public boolean edit(String oldCategoryId, String categoryId, String name, String description) {
-        if (categoryDao.isExist(oldCategoryId) && !categoryDao.isExist(categoryId)) {
+        if (true) {
             if(categoryDao.update(oldCategoryId, categoryId, name, description)) return true;
             else return false;
         } else return false;

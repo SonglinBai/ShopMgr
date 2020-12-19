@@ -38,6 +38,7 @@ public class SupplierDaoImpl implements SupplierDao {
         try {
             template.update(sql, supplierId, name, addr, phone);
         } catch (DataAccessException e) {
+            e.printStackTrace();
             return false;
         }
         return true;
@@ -62,7 +63,6 @@ public class SupplierDaoImpl implements SupplierDao {
         try {
             template.queryForObject(sql, new BeanPropertyRowMapper<Supplier>(Supplier.class), supplierId);
         } catch (DataAccessException e) {
-            e.printStackTrace();
             return false;
         }
         return true;

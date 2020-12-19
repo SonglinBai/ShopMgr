@@ -35,7 +35,7 @@ public class SupplierServiceImpl implements SupplierService {
 
     @Override
     public boolean edit(String oldSupplierId, String supplierId, String name, String addr, String phone) {
-        if (supplierDao.isExist(oldSupplierId) && !supplierDao.isExist(supplierId)) {
+        if (true) {
             if (supplierDao.update(oldSupplierId, supplierId, name, addr, phone)) return true;
             else return false;
         } else return false;

@@ -60,13 +60,15 @@ public class CategoryServlet extends BaseServlet{
         String description = request.getParameter("description");
 
         ResultInfo info = new ResultInfo();
-        if(!ocidStr.equals(cidStr)&&service.isIdExist(cidStr)) {
-            info.setFlag(false);
-            info.setErrorMsg("该分类ID已经存在");
-        }else if(service.isUsed(ocidStr)){
-            info.setFlag(false);
-            info.setErrorMsg("原分类已经被使用");
-        }else {
+        if (!ocidStr.equals(cidStr)) {
+            if(service.isIdExist(cidStr)) {
+                info.setFlag(false);
+                info.setErrorMsg("该分类ID已经存在");
+            }else if(service.isUsed(ocidStr)) {
+                info.setFlag(false);
+                info.setErrorMsg("原分类已经被使用");
+            }
+        } else {
             if(service.edit(ocidStr,cidStr,name,description)){
                 info.setFlag(true);
             }else {

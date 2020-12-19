@@ -1,3 +1,4 @@
+use ShopMgr;
 create table tb_category
 (
     categoryId   varchar(10)  not null

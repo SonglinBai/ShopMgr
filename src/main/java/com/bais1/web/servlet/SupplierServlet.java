@@ -36,8 +36,8 @@ public class SupplierServlet extends BaseServlet{
 
     public void create(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String supplierId = request.getParameter("supplierId");
-        String name = request.getParameter("name");
-        String addr = request.getParameter("addr");
+        String name = request.getParameter("supplierName");
+        String addr = request.getParameter("address");
         String phone = request.getParameter("phone");
 
         ResultInfo info = new ResultInfo();
@@ -58,18 +58,21 @@ public class SupplierServlet extends BaseServlet{
     public void edit(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String oldSupplierId = request.getParameter("oldSupplierId");
         String supplierId = request.getParameter("supplierId");
-        String name = request.getParameter("name");
-        String addr = request.getParameter("addr");
+        String name = request.getParameter("supplierName");
+        String addr = request.getParameter("address");
         String phone = request.getParameter("phone");
 
         ResultInfo info = new ResultInfo();
-        if(!oldSupplierId.equals(supplierId) && service.isIdExist(supplierId)) {
-            info.setFlag(false);
-            info.setErrorMsg("该供应商ID已经被使用，请更换一个");
-        } else if(service.isUsed(oldSupplierId)) {
-            info.setFlag(false);
-            info.setErrorMsg("供应商ID被引用，无法修改");
-        }else {
+        if(!oldSupplierId.equals(supplierId)) {
+            if(!oldSupplierId.equals(supplierId) && service.isIdExist(supplierId)) {
+                info.setFlag(false);
+                info.setErrorMsg("该供应商ID已经被使用，请更换一个");
+            } else if(service.isUsed(oldSupplierId)) {
+                info.setFlag(false);
+                info.setErrorMsg("供应商ID被引用，无法修改");
+            }
+        }
+        else {
             if (service.edit(oldSupplierId, supplierId, name, addr, phone)){
                 info.setFlag(true);
             }else{

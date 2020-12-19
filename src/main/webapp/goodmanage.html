@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
-    <title>库存管理系统-商品管理</title>
+    <title>超市管理系统-商品管理</title>
 
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -52,11 +52,13 @@
         <table class="table table-hover">
             <thead>
             <tr>
-                <th><input id="checkAll" type="checkbox"> 全选</th>
+                <th><input id="checkAll" type="checkbox"></th>
                 <th>商品ID</th>
                 <th>商品名</th>
                 <th>分类</th>
                 <th>供应商</th>
+                <th>零售价</th>
+                <th>进货价</th>
                 <th>数量</th>
                 <th>描述</th>
                 <th>操作</th>
@@ -113,14 +115,20 @@
                         <div class="form-group">
                             <label for="edit-category">分类</label>
                             <select id="edit-category" class="form-control">
-
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="edit-supplier">供应商</label>
                             <select id="edit-supplier" class="form-control">
-
                             </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-retailPrice">零售价</label>
+                            <input type="number" min="0" max="1000000" step="0.01" id="edit-retailPrice" class="form-control" placeholder="零售价">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-purchasePrice">进货价</label>
+                            <input type="number" min="0" max="1000000" step="0.01" id="edit-purchasePrice" class="form-control" placeholder="进货价">
                         </div>
 
                         <div class="form-group">
@@ -337,6 +345,8 @@
                         '                <td>' + good.goodName + '</td>\n' +
                         '                <td>' + ctname + '</td>\n' +
                         '                <td>' + spname + '</td>\n' +
+                        '                <td>' + good.retailPrice + '</td>\n' +
+                        '                <td>' + good.purchasePrice + '</td>\n' +
                         '                <td>' + good.inventory + '</td>\n' +
                         '                <td>' + good.description + '</td>\n' +
                         '                <td>\n' +
@@ -366,7 +376,7 @@
             $("#edit-inputGname").val(data.goodName);
             $("#edit-inputDescription").val(data.description);
             $.get("/category/getAll", {}, function (data) {
-                var options = '';
+                var options = '<option value="0">未分类</option>';
                 var ct;
                 for (var i = 0; i < data.length; i++) {
                     ct = data[i];
@@ -381,7 +391,7 @@
                 $("#edit-category").html(options);
             });
             $.get("/supplier/getAll", {}, function (data) {
-                var options = '';
+                var options = '<option value="0">未指定</option>';
                 var supplier;
                 for (var i = 0; i< data.length; i++) {
                     supplier = data[i];
@@ -395,6 +405,8 @@
 
                 $("#edit-supplier").html(options);
             });
+            $("#edit-retailPrice").val(data.retailPrice);
+            $("#edit-purchasePrice").val(data.purchasePrice);
             $("#edit-modal").modal('show');
         });
     }
@@ -407,8 +419,10 @@
         var supplierId = $("#edit-supplier").val();
         var name = $("#edit-inputGname").val();
         var description = $("#edit-inputDescription").val();
+        var retailPrice = $("#edit-retailPrice").val();
+        var purchasePrice = $("#edit-purchasePrice").val();
 
-        $.get("/good/edit", {'ogid': ogid, 'gid': gid, 'cid': cid, 'name': name, 'supplierId':supplierId, 'description': description}, function (data) {
+        $.get("/good/edit", {'ogid': ogid, 'gid': gid, 'cid': cid, 'name': name, 'supplierId':supplierId, 'retailPrice': retailPrice, 'purchasePrice':purchasePrice, 'description': description}, function (data) {
             $("#edit-modal").modal('hide');
             load();
         });
@@ -466,13 +480,15 @@
         $("#ogid").html("");
         $("#edit-inputGname").val("");
         $("#edit-inputDescription").val("");
+        $("#edit-retailPrice").val("");
+        $("#edit-purchasePrice").val("");
         $("#edit-submit").off('click').click(submitNew);
 
         // $.get("/good/getNextId", {}, function (data) {
         //     $("#edit-inputGid").val(data);
         // });
         $.get("/category/getAll", {}, function (data) {
-            var options = '';
+            var options = '<option value="0">未分类</option>';
             var ct;
             for (var i = 0; i < data.length; i++) {
                 ct = data[i];
@@ -482,8 +498,9 @@
 
             $("#edit-category").html(options);
         });
+        $("#edit-category").val("0");
         $.get("/supplier/getAll", {}, function (data) {
-            var options = '';
+            var options = '<option value="0">未指定</option>';
             var supplier;
             for (var i = 0; i < data.length; i++) {
                 supplier = data[i];
@@ -493,6 +510,7 @@
 
             $("#edit-supplier").html(options);
         });
+        $("edit-supplier").val("0");
 
         $("#edit-modal").modal('show');
     }
@@ -502,10 +520,12 @@
         var gid = $("#edit-inputGid").val();
         var cid = $("#edit-category").val();
         var name = $("#edit-inputGname").val();
-        var supplierId = $("edit-supplier").val();
+        var supplierId = $("#edit-supplier").val();
+        var retailPrice = $("#edit-retailPrice").val();
+        var purchasePrice = $("#edit-purchasePrice").val();
         var description = $("#edit-inputDescription").val();
 
-        $.get("/good/create", {'gid': gid, 'name': name, 'cid': cid, 'supplierId':supplierId, 'description': description}, function (data) {
+        $.get("/good/create", {'gid': gid, 'name': name, 'cid': cid, 'supplierId':supplierId,'retailPrice':retailPrice, 'purchasePrice':purchasePrice, 'description': description}, function (data) {
             if (data.flag) {
                 load();
                 $("#edit-modal").modal('hide');

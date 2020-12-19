@@ -3,9 +3,11 @@ package com.bais1.service.impl;
 import com.bais1.dao.CategoryDao;
 import com.bais1.dao.DocumentDao;
 import com.bais1.dao.GoodDao;
+import com.bais1.dao.SupplierDao;
 import com.bais1.dao.impl.CategoryDaoImpl;
 import com.bais1.dao.impl.DocumentDaoImpl;
 import com.bais1.dao.impl.GoodDaoImpl;
+import com.bais1.dao.impl.SupplierDaoImpl;
 import com.bais1.domain.Category;
 import com.bais1.domain.DocumentType;
 import com.bais1.domain.Good;
@@ -21,6 +23,7 @@ public class GoodServiceImpl implements GoodService {
     GoodDao goodDao = new GoodDaoImpl();
     CategoryDao categoryDao = new CategoryDaoImpl();
     DocumentDao documentDao = new DocumentDaoImpl();
+    SupplierDao supplierDao = new SupplierDaoImpl();
 
     @Override
     public PageBean<Good> pageQuery(String goodId, String goodName, String categoryId, String supplierId, int currentPage, int pageSize) {
@@ -35,9 +38,10 @@ public class GoodServiceImpl implements GoodService {
         int start = (currentPage - 1) * pageSize;
 
         List<Good> list = goodDao.getByPage(goodId, goodName, categoryId, supplierId, start, pageSize);
-//        for (Good good : list) {
-//            good.setCt(categoryDao.getById(good.getCategory()));
-//        }
+        for (Good good : list) {
+            good.setCategory(categoryDao.getById(good.getCategoryId()));
+            good.setSupplier(supplierDao.getById(good.getSupplierId()));
+        }
         pb.setList(list);
 
         int totalPage = totalCount % pageSize == 0 ? totalCount / pageSize : totalCount / pageSize + 1;

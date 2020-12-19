@@ -75,10 +75,10 @@ public class GoodDaoImpl implements GoodDao {
 
     @Override
     public boolean edit(String goodId, Good good) {
-        String sql = "update tb_good set goodId=?,goodName=?,categoryId=?, supplierId=?, description=? where goodId=?";
+        String sql = "update tb_good set goodId=?,goodName=?,categoryId=?, supplierId=?, retailPrice=?, purchasePrice=?, status=?, description=? where goodId=?";
 
         try {
-            template.update(sql, good.getGoodId(), good.getGoodName(), good.getCategoryId(), good.getSupplierId(), good.getDescription(), goodId);
+            template.update(sql, good.getGoodId(), good.getGoodName(), good.getCategoryId(), good.getSupplierId(), good.getRetailPrice(), good.getPurchasePrice(),good.getStatus().toString(), good.getDescription(), goodId);
         } catch (DataAccessException e) {
             return false;
         }
@@ -123,9 +123,9 @@ public class GoodDaoImpl implements GoodDao {
 
     @Override
     public boolean create(Good good) {
-        String sql = "insert into tb_good (goodId, goodName, categoryId, inventory, description) values (?,?,?,?,?)";
+        String sql = "insert into tb_good (goodId, goodName, categoryId,supplierId, retailPrice, purchasePrice , description) values (?,?,?,?,?,?,?)";
         try {
-            template.update(sql, good.getGoodId(), good.getGoodName(), good.getCategory(), good.getInventory(), good.getDescription());
+            template.update(sql, good.getGoodId(), good.getGoodName(), good.getCategoryId(),good.getSupplierId(), good.getRetailPrice(), good.getPurchasePrice(), good.getDescription());
         } catch (DataAccessException e) {
             return false;
         }

@@ -29,9 +29,9 @@ public class GoodServlet extends BaseServlet {
         //1.接受参数
         String currentPageStr = request.getParameter("currentPage");
         String pageSizeStr = request.getParameter("pageSize");
-        String categoryId = request.getParameter("cid");
+        String categoryId = request.getParameter("categoryId");
         String supplierId = request.getParameter("supplierId");
-        String goodName = request.getParameter("gname");
+        String goodName = request.getParameter("goodName");
         String goodId = request.getParameter("goodId");
 
         int currentPage = 0;//当前页码，如果不传递，则默认为第一页
@@ -62,8 +62,20 @@ public class GoodServlet extends BaseServlet {
         String cidStr = request.getParameter("cid");
         String description = request.getParameter("description");
         String supplierId = request.getParameter("supplierId");
+        String retailPriceStr = request.getParameter("retailPrice");
+        String purchasePriceStr = request.getParameter("purchasePrice");
 
-        Good good = new Good(gidStr, name, cidStr, supplierId, GoodStatus.ENABLE, description);
+        GoodStatus status = GoodStatus.ENABLE;
+
+        float retailPrice = 0;
+        if (retailPriceStr!=null && retailPriceStr.length()>0)
+            retailPrice = Float.parseFloat(retailPriceStr);
+
+        float purchasePrice = 0;
+        if (purchasePriceStr!=null && retailPriceStr.length()>0)
+            purchasePrice = Float.parseFloat(purchasePriceStr);
+
+        Good good = new Good(gidStr, name, cidStr, retailPrice, purchasePrice, supplierId, status, description);
         ResultInfo info = new ResultInfo();
         if (!ogidStr.equals(gidStr)&&goodService.isIdExist(good)) {
             info.setFlag(false);
@@ -142,8 +154,18 @@ public class GoodServlet extends BaseServlet {
         String cidStr = request.getParameter("cid");
         String supplierId = request.getParameter("supplierId");
         String description = request.getParameter("description");
+        String retailPriceStr = request.getParameter("retailPrice");
+        String purchasePriceStr = request.getParameter("purchasePrice");
 
-        Good good = new Good(gidStr, name, cidStr, supplierId, GoodStatus.ENABLE, description);
+        float retailPrice = 0;
+        if (retailPriceStr!=null && retailPriceStr.length()>0)
+            retailPrice = Float.parseFloat(retailPriceStr);
+
+        float purchasePrice = 0;
+        if (purchasePriceStr!=null && retailPriceStr.length()>0)
+            purchasePrice = Float.parseFloat(purchasePriceStr);
+
+        Good good = new Good(gidStr, name, cidStr, retailPrice, purchasePrice, supplierId, null, description);
         ResultInfo info = new ResultInfo();
         if (goodService.isIdExist(good)) {
             info.setFlag(false);

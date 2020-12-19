@@ -67,7 +67,7 @@
         //加载分类列表
         load();
 
-        $("#cat_new").click(function () {
+        $("#supplier_new").click(function () {
             hideErrorMsg();
             var inputSupplierId = $("#inputSupplierId");
             var inputSupplierName = $("#inputSupplierName");
@@ -82,8 +82,8 @@
             inputAddress.val('');
             oldSupplierId.html('');
             //为提交按钮绑定点击进行新建操作
-            $("#catagory-submit").off('click').click(function () {
-                $.get("/supplier/create",{'supplierId':inputSupplierId.val(),'name':inputSupplierName.val(),'phone':inputPhone.val(),'address':inputAddress.val()},function (data) {
+            $("#supplier-submit").off('click').click(function () {
+                $.get("/supplier/create",{'supplierId':inputSupplierId.val(),'supplierName':inputSupplierName.val(),'phone':inputPhone.val(),'address':inputAddress.val()},function (data) {
                     if(data.flag){
                         load();
                     }else {
@@ -92,12 +92,12 @@
                 });
             });
         });
-        $("#cat_delete").click(function () {
+        $("#supplier_delete").click(function () {
             hideErrorMsg();
             //获取ocid内容
-            var oldSupplierId = $("#oldSupplierId").html();
+            var SupplierId = $("#oldSupplierId").html();
             if(oldSupplierId.length > 0) {
-                $.get("/supplier/delete",{'oldSupplierId':oldSupplierId},function (data) {
+                $.get("/supplier/delete",{'SupplierId':SupplierId},function (data) {
                     if(data.flag){
                         load();
                     }else {

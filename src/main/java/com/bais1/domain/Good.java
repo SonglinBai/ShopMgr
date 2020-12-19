@@ -33,6 +33,17 @@ public class Good implements Serializable {
         this.description = description;
     }
 
+    public Good(String goodId, String goodName, String categoryId, float retailPrice, float purchasePrice, String supplierId, GoodStatus status, String description) {
+        this.goodId = goodId;
+        this.goodName = goodName;
+        this.categoryId = categoryId;
+        this.retailPrice = retailPrice;
+        this.purchasePrice = purchasePrice;
+        this.supplierId = supplierId;
+        this.status = status;
+        this.description = description;
+    }
+
     @Override
     public String toString() {
         return "Good{" +
