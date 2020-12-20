@@ -6,6 +6,7 @@ import java.util.Date;
 public class Document implements Serializable {
     private String documentId;
     private float price;
+    private float discount;
     private Date orderTime;
     private String userAccount;
     private DocumentType type;
@@ -18,6 +19,7 @@ public class Document implements Serializable {
         return "Document{" +
                 "documentId='" + documentId + '\'' +
                 ", price=" + price +
+                ", discount=" + discount +
                 ", orderTime=" + orderTime +
                 ", userAccount='" + userAccount + '\'' +
                 ", type=" + type +
@@ -26,14 +28,19 @@ public class Document implements Serializable {
                 '}';
     }
 
-    public Document(String documentId, float price, Date orderTime, String userAccount, DocumentType type, String note, User user) {
+    public Document(String documentId, float price, float discount, Date orderTime, String userAccount, DocumentType type, String note, User user) {
         this.documentId = documentId;
         this.price = price;
+        this.discount = discount;
         this.orderTime = orderTime;
         this.userAccount = userAccount;
         this.type = type;
         this.note = note;
         this.user = user;
+    }
+
+    public Document() {
+
     }
 
     public String getDocumentId() {
@@ -50,6 +57,13 @@ public class Document implements Serializable {
 
     public void setPrice(float price) {
         this.price = price;
+    }
+    public float getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(float discount) {
+        this.discount = discount;
     }
 
     public Date getOrderTime() {

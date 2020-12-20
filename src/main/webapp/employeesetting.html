@@ -20,7 +20,7 @@
         <table class="table table-hover">
             <thead>
             <tr>
-                <th>用户ID</th>
+                <th>账号</th>
                 <th>用户名</th>
                 <th>用户状态</th>
                 <th>操作</th>
@@ -63,21 +63,25 @@
                     <span id="ogid" style="display: none"></span>
                     <div style="margin: 20px;">
                         <div class="form-group" style="margin-top: 20px;">
-                            <label for="edit-inputUsername">账号</label>
-                            <input type="text" class="form-control" id="edit-inputUsername" placeholder="username" name="username">
+                            <label for="edit-inputUserAccount">账号</label>
+                            <input type="text" class="form-control" id="edit-inputUserAccount" placeholder="username" name="userAccount">
                         </div>
                         <div class="form-group">
                             <label for="edit-inputPassword">密码</label>
-                            <input type="password" class="form-control" id="edit-inputPassword" placeholder="password" name="password">
+                            <input type="password" class="form-control" id="edit-inputPassword" placeholder="password" name="passwd">
                         </div>
                         <div class="form-group">
-                            <label for="edit-inputName">姓名</label>
-                            <input type="text" class="form-control" id="edit-inputName" placeholder="name" name="name">
+                            <label for="edit-inputUserName">用户名</label>
+                            <input type="text" class="form-control" id="edit-inputUserName" placeholder="name" name="age">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-inputAge">年龄</label>
+                            <input type="text" class="form-control" id="edit-inputAge" placeholder="name" name="age">
                         </div>
                         <div class="form-group">
                             <label >性别</label>
-                            <input type="radio" name="sex" value="0">男
-                            <input type="radio" name="sex" value="1">女
+                            <input type="radio" name="gender" value="MALE">男
+                            <input type="radio" name="gender" value="FEMALE">女
                         </div>
                         <div class="form-group">
                             <label for="edit-inputEmail">邮箱</label>
@@ -101,6 +105,7 @@
 <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
 <script src="js/bootstrap.min.js"></script>
 <script src="js/include.js" type="application/javascript"></script>
+<script src="js/jquery.md5.min.js" type="application/javascript"></script>
 <script type="application/javascript">
     $(function () {
         load();
@@ -111,29 +116,29 @@
         $.get("user/getEmployees",{},function (data) {
             for (var i = 0;i<data.length;i++){
                 var employee = data[i];
-                if(employee.status==0) {
+                if(employee.status==='UNACTIVATED') {
                     status = '未激活';
                 }
-                else if(employee.status==100) {
-                    status = '已激活';
+                else if(employee.status==='ENABLE') {
+                    status = '正常';
                 }
-                else if(employee.status==200) {
+                else if(employee.status==='DISABLE') {
                     status = '已停用';
                 }
 
 
                 var tr='            <tr>\n' +
-                    '                <td>'+employee.uid+'</td>\n' +
-                    '                <td>'+employee.username+'</td>\n' +
+                    '                <td>'+employee.userAccount+'</td>\n' +
+                    '                <td>'+employee.userName+'</td>\n' +
                     '                <td>'+status+'</td>\n' +
                     '                <td>\n' +
-                    '                    <button type="button" class="btn btn-default btn-xs" onclick="enable('+employee.uid+')">\n' +
+                    '                    <button type="button" class="btn btn-default btn-xs" onclick="enable(\''+employee.userAccount+'\')">\n' +
                     '                        <span class="glyphicon glyphicon-ok-circle"></span>\n' +
                     '                    </button>\n' +
-                    '                    <button type="button" class="btn btn-default btn-xs" onclick="disable('+employee.uid+')">\n' +
+                    '                    <button type="button" class="btn btn-default btn-xs" onclick="disable(\''+employee.userAccount+'\')">\n' +
                     '                        <span class="glyphicon glyphicon-ban-circle"></span>\n' +
                     '                    </button>\n' +
-                    '                    <button type="button" class="btn btn-default btn-xs" onclick="remove('+employee.uid+')">\n' +
+                    '                    <button type="button" class="btn btn-default btn-xs" onclick="remove(\''+employee.userAccount+'\')">\n' +
                     '                        <span class="glyphicon glyphicon-remove"></span>\n' +
                     '                    </button>\n' +
                     '                </td>\n' +
@@ -176,7 +181,13 @@
     }
 
     function confirmNew() {
-        $.get("/user/regist",$("#edit-form").serialize(),function (data) {
+        var userAccount = $("#edit-inputUserAccount").val();
+        var password = $.MD5(userAccount+'#'+$("#edit-inputPassword").val());
+        var userName = $("#edit-inputUserName").val();
+        var gender = $("input[name='gender']").val();
+        var age = $("#edit-inputAge").val();
+        var email = $("#edit-inputEmail").val();
+        $.get("/user/regist",{'userAccount':userAccount,'passwd':password,'userName':userName,'gender':gender,'age':age,'email':email},function (data) {
             if(data.flag) {
                 $("#edit-modal").modal('hide');
                 load();

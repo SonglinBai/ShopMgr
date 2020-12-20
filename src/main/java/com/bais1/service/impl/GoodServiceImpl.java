@@ -8,10 +8,7 @@ import com.bais1.dao.impl.CategoryDaoImpl;
 import com.bais1.dao.impl.DocumentDaoImpl;
 import com.bais1.dao.impl.GoodDaoImpl;
 import com.bais1.dao.impl.SupplierDaoImpl;
-import com.bais1.domain.Category;
-import com.bais1.domain.DocumentType;
-import com.bais1.domain.Good;
-import com.bais1.domain.PageBean;
+import com.bais1.domain.*;
 import com.bais1.service.GoodService;
 
 import java.util.Date;
@@ -39,8 +36,10 @@ public class GoodServiceImpl implements GoodService {
 
         List<Good> list = goodDao.getByPage(goodId, goodName, categoryId, supplierId, start, pageSize);
         for (Good good : list) {
-            good.setCategory(categoryDao.getById(good.getCategoryId()));
-            good.setSupplier(supplierDao.getById(good.getSupplierId()));
+            if (good.getCategoryId()!=null)
+                good.setCategory(categoryDao.getById(good.getCategoryId()));
+            if (good.getSupplierId()!=null)
+                good.setSupplier(supplierDao.getById(good.getSupplierId()));
         }
         pb.setList(list);
 
@@ -63,7 +62,12 @@ public class GoodServiceImpl implements GoodService {
 
     @Override
     public Good getById(String goodId) {
-        return goodDao.getById(goodId);
+        Good good = goodDao.getById(goodId);
+        if(good.getCategoryId()!=null)
+            good.setCategory(categoryDao.getById(good.getCategoryId()));
+        if(good.getSupplierId()!=null)
+            good.setSupplier(supplierDao.getById(good.getSupplierId()));
+        return good;
     }
 
     @Override
@@ -82,24 +86,28 @@ public class GoodServiceImpl implements GoodService {
     }
 
     @Override
-    public boolean purchaseGood(Map<String, Integer> goods, String user) {
+    public boolean purchaseGood(Map<String, Integer> goods,float realPrice,String note, User user) {
         boolean flag = true;
-        String documentId = documentDao.create(DocumentType.PURCHASE, user, new Date(System.currentTimeMillis()));
+        float price = originPrice(goods,DocumentType.PURCHASE);
+        float discount = price-realPrice;
+        String documentId = documentDao.create(DocumentType.PURCHASE, user,price,discount,note, new Date(System.currentTimeMillis()));
         if (documentId == null) flag = false;
         for (Map.Entry<String, Integer> good : goods.entrySet()) {
-            if (!documentDao.createDetail(documentId, good.getKey(), good.getValue()) || !goodDao.add(good.getKey(), good.getValue()))
+            if (!documentDao.createDetail(documentId, good.getKey(), good.getValue(), originPrice(good.getKey(),good.getValue(),DocumentType.PURCHASE)) || !goodDao.add(good.getKey(), good.getValue()))
                 flag = false;
         }
         return flag;
     }
 
     @Override
-    public boolean saleGood(Map<String, Integer> goods, String user) {
+    public boolean saleGood(Map<String, Integer> goods,float realPrice,String note, User user) {
         boolean flag = true;
-        String documentId = documentDao.create(DocumentType.SALE, user, new Date(System.currentTimeMillis()));
+        float price = originPrice(goods,DocumentType.SALE);
+        float discount = price-realPrice;
+        String documentId = documentDao.create(DocumentType.SALE, user,price,discount,note, new Date(System.currentTimeMillis()));
         if (documentId == null) flag = false;
         for (Map.Entry<String, Integer> good : goods.entrySet()) {
-            if (!documentDao.createDetail(documentId, good.getKey(), good.getValue()) || !goodDao.reduce(good.getKey(), good.getValue()))
+            if (!documentDao.createDetail(documentId, good.getKey(), good.getValue(),originPrice(good.getKey(),good.getValue(),DocumentType.SALE)) || !goodDao.reduce(good.getKey(), good.getValue()))
                 flag = false;
         }
         return flag;
@@ -126,4 +134,35 @@ public class GoodServiceImpl implements GoodService {
     public boolean isUsed(String goodId) {
         return goodDao.isUsed(goodId);
     }
+
+
+    public float originPrice(Map<String, Integer> goods,DocumentType type) {
+        float price = 0;
+
+        Good oGood;
+
+        if(type.equals(DocumentType.SALE)) {
+            for (Map.Entry<String, Integer> good : goods.entrySet()) {
+                oGood = goodDao.getById(good.getKey());
+                price += oGood.getRetailPrice() * good.getValue();
+            }
+        }else{
+            for (Map.Entry<String, Integer> good : goods.entrySet()) {
+                oGood = goodDao.getById(good.getKey());
+                price += oGood.getPurchasePrice() * good.getValue();
+            }
+
+        }
+        return price;
+    }
+
+    public float originPrice(String good, int amount, DocumentType type) {
+        Good oGood = goodDao.getById(good);
+        if(type.equals(DocumentType.SALE)) {
+            return oGood.getRetailPrice() * amount;
+        }else {
+            return oGood.getPurchasePrice()*amount;
+        }
+    }
+
 }

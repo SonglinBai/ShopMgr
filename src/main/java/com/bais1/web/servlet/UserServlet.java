@@ -4,6 +4,7 @@ import com.bais1.domain.*;
 import com.bais1.service.UserService;
 import com.bais1.service.impl.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.tools.javac.jvm.Gen;
 import org.apache.commons.beanutils.BeanUtils;
 
 import javax.servlet.ServletException;
@@ -21,18 +22,15 @@ public class UserServlet extends BaseServlet {
     private UserService service = new UserServiceImpl();
 
     public void regist(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        //1.获取数据
-        Map<String, String[]> map = request.getParameterMap();
-
         //2.封装对象
         User user = new User();
-        try {
-            BeanUtils.populate(user, map);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
+        user.setUserAccount(request.getParameter("userAccount"));
+        user.setUserName(request.getParameter("userName"));
+        user.setUserRole(UserRole.EMPLOYEE);
+        user.setPasswd(request.getParameter("passwd"));
+        user.setEmail(request.getParameter("email"));
+        user.setAge(Integer.parseInt(request.getParameter("age")));
+        user.setGender(request.getParameter("gender").equals("MALE")? Gender.MALE:Gender.FEMALE);
 
         //3.调用service完成注册
         boolean flag = service.regist(user);
@@ -197,19 +195,24 @@ public class UserServlet extends BaseServlet {
 
     public void set(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        Map<String, String[]> map = request.getParameterMap();
+//        Map<String, String[]> map = request.getParameterMap();
         User u =(User)request.getSession().getAttribute("user");
 
         User user = new User();
+        user.setUserAccount(request.getParameter("userAccount"));
+        user.setUserName(request.getParameter("userName"));
+        user.setPasswd(request.getParameter("passwd"));
+        user.setGender(request.getParameter("gender").equals("MALE")?Gender.MALE:Gender.FEMALE);
+        user.setEmail(request.getParameter("email"));
         user.setUserRole(u.getUserRole());
         user.setStatus(u.getStatus());
         user.setActiveCode(u.getActiveCode());
         ResultInfo info = new ResultInfo();
-        try {
-            BeanUtils.populate(user, map);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            BeanUtils.populate(user, map);
+//        } catch (IllegalAccessException | InvocationTargetException e) {
+//            e.printStackTrace();
+//        }
 
         if (!user.getUserName().equals(u.getUserName()) &&service.isUserAccountExist(user)) {
             info.setFlag(false);

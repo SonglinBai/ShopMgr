@@ -3,6 +3,7 @@ package com.bais1.dao;
 import com.bais1.domain.Document;
 import com.bais1.domain.DocumentDetail;
 import com.bais1.domain.DocumentType;
+import com.bais1.domain.User;
 
 import java.util.Date;
 import java.util.List;
@@ -33,7 +34,7 @@ public interface DocumentDao {
 
     List<DocumentDetail> getDetail(String documentId);
 
-    String create(DocumentType type, String user, Date time);
+    String create(DocumentType type, User user,float price,float discount, String note, Date time);
 
-    boolean createDetail(String did,String good,int amount);
+    boolean createDetail(String did,String good,int amount,float price);
 }

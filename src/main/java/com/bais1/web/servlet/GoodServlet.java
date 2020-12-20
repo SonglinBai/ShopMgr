@@ -181,41 +181,59 @@ public class GoodServlet extends BaseServlet {
         writeValue(info, response);
     }
 
-    public void importGood(HttpServletRequest request, HttpServletResponse response) {
+    public void purchase(HttpServletRequest request, HttpServletResponse response) {
         User user = (User) request.getSession().getAttribute("user");
         Enumeration<String> gids = request.getParameterNames();
         Map<String, Integer> map = new HashMap<>();
+        float realPrice=0;
+        String note=null;
 
         String amountStr;
         String gidStr;
 
         while (gids.hasMoreElements()) {
             gidStr = (String) gids.nextElement();
+            if(gidStr.equals("realPrice")){
+                realPrice=Float.parseFloat(request.getParameter(gidStr));
+                continue;
+            }else if(gidStr.equals("note")) {
+                note=request.getParameter(gidStr);
+                continue;
+            }
             amountStr = request.getParameter(gidStr);
 
             if (amountStr != null || amountStr.length() > 0)
                 map.put(gidStr, Integer.parseInt(amountStr));
             else continue;
         }
-        goodService.purchaseGood(map, user.getUserAccount());
+        goodService.purchaseGood(map,realPrice,note, user);
     }
 
-    public void exportGood(HttpServletRequest request, HttpServletResponse response) {
+    public void sale(HttpServletRequest request, HttpServletResponse response) {
         User user = (User) request.getSession().getAttribute("user");
         Enumeration<String> gids = request.getParameterNames();
         Map<String, Integer> map = new HashMap<>();
+        float realPrice=0;
+        String note = null;
 
         String amountStr;
         String gidStr;
 
         while (gids.hasMoreElements()) {
             gidStr = (String) gids.nextElement();
+            if(gidStr.equals("realPrice")){
+                realPrice=Float.parseFloat(request.getParameter(gidStr));
+                continue;
+            }else if(gidStr.equals("note")) {
+                note=request.getParameter(gidStr);
+                continue;
+            }
             amountStr = request.getParameter(gidStr);
             if (amountStr != null || amountStr.length() > 0)
                 map.put(gidStr, Integer.parseInt(amountStr));
             else continue;
         }
-        goodService.saleGood(map, user.getUserAccount());
+        goodService.saleGood(map,realPrice,note, user);
     }
 
     public void getByArray(HttpServletRequest request, HttpServletResponse response) throws IOException {

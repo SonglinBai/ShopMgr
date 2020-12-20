@@ -3,7 +3,10 @@ package com.bais1.dao.impl;
 import com.bais1.dao.UserDao;
 import com.bais1.domain.Gender;
 import com.bais1.domain.User;
+import com.bais1.domain.UserRole;
+import com.bais1.domain.UserStatus;
 import com.bais1.util.JDBCUtils;
+import com.sun.tools.javac.jvm.Gen;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -48,18 +51,34 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public boolean save(User user) {
+        String userAccount = user.getUserAccount();
+        String username = user.getUserName();
+        String password = user.getPasswd();
+        int age = user.getAge();
+        String role = "EMPLOYEE";
+        String gender = "MALE";
+        String status = "ENABLE";
+        if (user.getUserRole()!=null)
+            role = user.getUserRole().equals(UserRole.ADMINISTRATOR)?"ADMINISTRATOR":"EMPLOYEE";
+        if(user.getGender()!=null)
+            gender = user.getGender().equals(Gender.MALE)?"MALE":"FEMALE";
+        String email = user.getEmail();
+        String activerCode = user.getActiveCode();
+        if(user.getStatus()!=null)
+            status = user.getStatus().equals(UserStatus.DISABLE)?"DISABLE":user.getStatus().equals(UserStatus.UNACTIVATED)?"UNACTIVATED":"ENABLE";
+
         try {
             //1.定义sql
             String sql = "insert into tb_user(userAccount, passwd, userName ,gender, email, userRole,status, activeCode) VALUES (?,?,?,?,?,?,?,?)";
             template.update(sql,
-                    user.getUserAccount(),
-                    user.getPasswd(),
-                    user.getUserName(),
-                    user.getGender(),
-                    user.getEmail(),
-                    2,
-                    0,
-                    user.getActiveCode()
+                    userAccount,
+                    password,
+                    username,
+                    gender,
+                    email,
+                    role,
+                    status,
+                    activerCode
             );
         }catch (Exception e) {
             System.out.println(user.getUserAccount()+ "保存失败");
@@ -71,7 +90,7 @@ public class UserDaoImpl implements UserDao {
     @Override
     public boolean enable(User user) {
         try {
-            String sql = "update tb_user set status=1 where userAccount=?";
+            String sql = "update tb_user set status='ENABLE' where userAccount=?";
             template.update(sql, user.getUserAccount());
         } catch (Exception e) {
             System.out.println(user.getUserAccount()+ "激活失败");
@@ -113,14 +132,23 @@ public class UserDaoImpl implements UserDao {
         String userAccount = user.getUserAccount();
         String username = user.getUserName();
         String password = user.getPasswd();
-        String name = user.getUserName();
-        Gender sex = user.getGender();
+        int age = user.getAge();
+        String role = "EMPLOYEE";
+        String gender = "MALE";
+        String status = "ENABLE";
+        if (user.getUserRole()!=null)
+            role = user.getUserRole().equals(UserRole.ADMINISTRATOR)?"ADMINISTRATOR":"EMPLOYEE";
+        if(user.getGender()!=null)
+            gender = user.getGender().equals(Gender.MALE)?"MALE":"FEMALE";
         String email = user.getEmail();
+        String activerCode = user.getActiveCode();
+        if(user.getStatus()!=null)
+            status = user.getStatus().equals(UserStatus.DISABLE)?"DISABLE":user.getStatus().equals(UserStatus.UNACTIVATED)?"UNACTIVATED":"ENABLE";
 
-        String sql = "update tb_user set userAccount=?,passwd=?,userName=?,gender=?,email=? where userAccount=?";
+        String sql = "update tb_user set passwd=?,userName=?,gender=?,age=?,userRole=?,status=?,email=?,activeCode=? where userAccount=?";
 
         try {
-            template.update(sql,username,password,name,sex,email,userAccount);
+            template.update(sql, password,username,gender,age,role,status,email,activerCode, userAccount);
         } catch (DataAccessException e) {
             return false;
         }
@@ -129,7 +157,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public List<User> getEmployees() {
-        String sql = "select * from tb_user where userRole=2";
+        String sql = "select * from tb_user where userRole='EMPLOYEE'";
         return template.query(sql,new BeanPropertyRowMapper<User>(User.class));
     }
 

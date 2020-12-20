@@ -1,5 +1,7 @@
 package com.bais1.domain;
 
+import javax.print.Doc;
+
 public class DocumentDetail {
     private String documentId;
     private String goodId;
@@ -26,6 +28,7 @@ public class DocumentDetail {
         this.price = price;
         this.good = good;
     }
+    public DocumentDetail(){}
 
     public String getDocumentId() {
         return documentId;

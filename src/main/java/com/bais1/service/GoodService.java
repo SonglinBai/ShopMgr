@@ -2,6 +2,7 @@ package com.bais1.service;
 
 import com.bais1.domain.Good;
 import com.bais1.domain.PageBean;
+import com.bais1.domain.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +24,9 @@ public interface GoodService {
 
     boolean deleteByArray(ArrayList<String> goodIds);
 
-    boolean purchaseGood(Map<String,Integer> goods,String user);
+    boolean purchaseGood(Map<String,Integer> goods,float realPrice,String note, User user);
 
-    boolean saleGood(Map<String,Integer> goods,String user);
+    boolean saleGood(Map<String,Integer> goods,float realPrice,String note, User user);
 
     List<Good> getByArray(ArrayList<String> goodIds);
 

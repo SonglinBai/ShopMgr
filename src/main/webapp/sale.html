@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
-    <title>超市管理系统-入库</title>
+    <title>超市管理系统-销售</title>
 
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -17,57 +17,87 @@
 
 <div class="main-container">
     <div id="errorMsg" class="alert alert-danger" role="alert" style="display: none;"></div>
-    <div class="tool-container">
-        <form class="form-inline" action="javascript:void(0)">
-            <div class="form-group">
-                <label for="inputGname">商品编号</label>
-                <input type="text" class="form-control" id="inputGid" placeholder="商品ID">
-            </div>
-            <div class="form-group">
-                <label for="inputGname">商品名</label>
-                <input type="text" class="form-control" id="inputGname" placeholder="商品名">
-            </div>
-            <div class="form-group">
-                <label for="selectCatagory">分类</label>
-                <select class="form-control" id="selectCatagory">
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="selectSupplier">供应商</label>
-                <select class="form-control" id="selectSupplier">
-                </select>
-            </div>
-            <button class="btn btn-default" onclick="javascript:search()">查询</button>
-            <div style="display: inline;">
-                <button type="button" class="btn btn-primary" onclick="addSelected()">添加选中</button>
-            </div>
-        </form>
+    <div id="goodTable">
+        <div class="tool-container">
+            <form class="form-inline" action="javascript:void(0)">
+                <div class="form-group">
+                    <label for="inputGname">商品编号</label>
+                    <input type="text" class="form-control" id="inputGid" placeholder="商品ID">
+                </div>
+                <div class="form-group">
+                    <label for="inputGname">商品名</label>
+                    <input type="text" class="form-control" id="inputGname" placeholder="商品名">
+                </div>
+                <div class="form-group">
+                    <label for="selectCatagory">分类</label>
+                    <select class="form-control" id="selectCatagory">
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="selectSupplier">供应商</label>
+                    <select class="form-control" id="selectSupplier">
+                    </select>
+                </div>
+                <button class="btn btn-default" onclick="javascript:search()">查询</button>
+                <div style="display: inline;">
+                    <button type="button" class="btn btn-primary" onclick="addSelected()">添加选中</button>
+                </div>
+            </form>
+        </div>
+        <div class="table-container">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th><input id="checkAll" type="checkbox"></th>
+                    <th>商品ID</th>
+                    <th>商品名</th>
+                    <th>分类</th>
+                    <th>供应商</th>
+                    <th>零售价</th>
+                    <th>数量</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody id="goodBody">
+                </tbody>
+            </table>
+            <div>总共<span id="totalPage"> </span>页 共<span id="totalCount"> </span>条记录</div>
+            <nav aria-label="...">
+                <ul class="pagination" id="pageNum"></ul>
+            </nav>
+        </div>
     </div>
-    <div class="table-container">
-        <table class="table table-hover">
-            <thead>
-            <tr>
-                <th><input id="checkAll" type="checkbox"></th>
-                <th>商品ID</th>
-                <th>商品名</th>
-                <th>分类</th>
-                <th>供应商</th>
-                <th>零售价</th>
-                <th>进货价</th>
-                <th>数量</th>
-                <th>描述</th>
-                <th>操作</th>
-            </tr>
-            </thead>
-            <tbody id="goodBody">
-            </tbody>
-        </table>
-        <div>总共<span id="totalPage"> </span>页 共<span id="totalCount"> </span>条记录</div>
-        <nav aria-label="...">
-            <ul class="pagination" id="pageNum"></ul>
-        </nav>
+    <div id="saleTable">
+        <div class="table-container">
+            <form id="sale-form" class="form-horizontal" onsubmit="javascripy:void(0)">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>商品ID</th>
+                    <th>商品名</th>
+                    <th>分类</th>
+                    <th>供应商</th>
+                    <th>零售价</th>
+                    <th>库存量</th>
+                    <th>数量</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody id="saleTableBody">
+                </tbody>
+            </table>
+                <div>
+                    <span>应收金额：</span><span id="originPrice">0</span><br>
+                    <input type="number" name="realPrice" min="0" max="100000" step="0.01" placeholder="实收金额"><br>
+                    <textarea placeholder="备注" name="note"></textarea><br>
+                    <button class="btn btn-primary" onclick="sale()">提交</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
+
+
 
 
 
@@ -237,15 +267,10 @@
                         '                <td>' + ctname + '</td>\n' +
                         '                <td>' + spname + '</td>\n' +
                         '                <td>' + good.retailPrice + '</td>\n' +
-                        '                <td>' + good.purchasePrice + '</td>\n' +
                         '                <td>' + good.inventory + '</td>\n' +
-                        '                <td>' + good.description + '</td>\n' +
                         '                <td>\n' +
-                        '                    <button type="button" class="btn btn-default btn-xs" onclick="editGood(\'' + good.goodId + '\')">\n' +
-                        '                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>\n' +
-                        '                    </button>\n' +
-                        '                    <button type="button" class="btn btn-default btn-xs" onclick="removeGood(\'' + good.goodId + '\')">\n' +
-                        '                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>\n' +
+                        '                    <button type="button" class="btn btn-default btn-xs" onclick="add(\'' + good.goodId + '\')">\n' +
+                        '                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>\n' +
                         '                    </button>\n' +
                         '                </td>\n' +
                         '            </tr>\n';
@@ -275,6 +300,101 @@
         }
 
         load(goodId, goodName, categoryId, supplierId, 1);
+    }
+
+    function add(goodId) {
+        var tableBody = $("#saleTableBody");
+        var goods = $("tr.saleGood");
+        var ids = goods.find("td.goodId");
+        var amounts = goods.find("input.amount");
+        var flag = true;
+        for (var i = 0; i < goods.length; i++) {
+            var id = ids[i].innerHTML;
+            var amount = amounts[i].value;
+            if (goodId === id) {
+                amounts[i].value = ++amount;
+                flag = false;
+            }
+        }
+        if (flag) {
+            $.get("/good/getById", {'gid': goodId}, function (good) {
+                if (good.category==null){
+                    ctname = '未分类';
+                } else {
+                    ctname = good.category.categoryName;
+                }
+                if (good.supplier==null) {
+                    spname = '未指定';
+                } else {
+                    spname = good.supplier.supplierName;
+                }
+                var tr = document.createElement('tr');
+                tr.innerHTML=
+                    '                <td class="goodId">' + good.goodId + '</td>' +
+                    '                <td>' + good.goodName + '</td>\n' +
+                    '                <td>' + ctname + '</td>\n' +
+                    '                <td>' + spname + '</td>\n' +
+                    '                <td class="retailPrice">' + good.retailPrice + '</td>\n' +
+                    '                <td>' + good.inventory + '</td>\n' +
+                    '                <td><input class="amount" type="number" min="0" name="'+good.goodId+'" value="1" max=">' + good.inventory + '" step="1" onchange="updateOriginPrice()"></td>\n' +
+                    '                <td>\n' +
+                    // '                    <button type="button" class="btn btn-default btn-xs" onclick="editGood(\'' + good.goodId + '\')">\n' +
+                    // '                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>\n' +
+                    // '                    </button>\n' +
+                    '                    <button type="button" class="btn btn-default btn-xs" onclick="remove(\'' + good.goodId + '\')">\n' +
+                    '                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>\n' +
+                    '                    </button>\n' +
+                    '                </td>\n'
+                    ;
+                tr.setAttribute("class","saleGood");
+                tableBody.append(tr);
+                updateOriginPrice();
+            });
+        }
+        updateOriginPrice();
+    }
+
+    function addSelected() {
+        var checked = $(".checkbox:checked");
+
+        for (var i = 0; i<checked.length;i++) {
+            add(checked[i].value);
+        }
+    }
+
+    function remove(goodId) {
+        var tableBody = $("#saleTableBody");
+        var goods = $("tr.saleGood");
+        var ids = goods.find("td.goodId");
+        for (var i = 0; i < goods.length; i++) {
+            var id = ids[i].innerHTML;
+            if (goodId === id) {
+                goods[i].remove();
+            }
+        }
+        updateOriginPrice();
+    }
+
+    function sale() {
+        $.get("/good/sale", $("#sale-form").serialize(), function (data) {
+            load();
+        })
+    }
+    function confirmSale() {
+
+    }
+
+    function updateOriginPrice() {
+        var goods = $("tr.saleGood");
+        var ids = goods.find("td.goodId");
+        var amounts = goods.find("input.amount");
+        var prices = goods.find("td.retailPrice");
+        var originPrice = 0;
+        for (var i = 0; i < goods.length; i++) {
+            originPrice+=prices[i].innerHTML*amounts[i].value;
+        }
+        $("#originPrice").html(originPrice);
+
     }
 </script>
     </body>

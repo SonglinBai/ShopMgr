@@ -18,26 +18,30 @@
 <div class="main-container">
     <div style="width: 500px;margin: 0 auto">
         <form action="javascript:void(0)" id="form-setting">
-            <input style="display: none;" name="uid">
+            <input style="display: none;" name="userAccount">
             <div style="text-align: center;margin-bottom: 20px"><h2>用户设置</h2></div>
             <div id="errorMsg2" class="alert alert-danger" role="alert" style="display: none;"></div>
             <fieldset disabled>
                     <div class="form-group">
-                        <label for="inputUserName">账号</label>
-                        <input type="text" id="inputUserName" class="form-control" placeholder="UserName" name="username">
+                        <label for="userAccount">账号</label>
+                        <span id="userAccount" class="form-control"></span>
                     </div>
                     <div class="form-group">
                         <label for="inputPassword">密码</label>
-                        <input type="password" id="inputPassword" class="form-control" placeholder="Password" name="password">
+                        <input type="password" id="inputPassword" class="form-control" placeholder="Password" name="passwd">
                     </div>
                     <div class="form-group">
-                        <label for="inputName">姓名</label>
-                        <input type="text" id="inputName" class="form-control" placeholder="Name" name="name">
+                        <label for="inputUserName">用户名</label>
+                        <input type="text" id="inputUserName" class="form-control" placeholder="Name" name="userName">
+                    </div>
+                    <div class="form-group">
+                        <label for="inputAge">年龄</label>
+                        <input type="text" id="inputAge" class="form-control" placeholder="Name" name="age">
                     </div>
                     <div class="form-group">
                         <label>性别</label>
-                        <input id="radio-male" type="radio" name="sex" value="0">男
-                        <input id="radio-female" type="radio" name="sex" value="1">女
+                        <input id="radio-male" type="radio" name="gender" value="MALE">男
+                        <input id="radio-female" type="radio" name="gender" value="FEMALE">女
                     </div>
                     <div class="form-group">
                         <label for="inputEmail">邮箱</label>
@@ -62,10 +66,9 @@
             </div>
             <div id="verify-modal-body" class="modal-body">
                 <form id="verify-form">
-                    <input name="username" value="admin" style="display: none">
                     <div class="form-group">
                         <label for="inputVerifyPassword">密码</label>
-                        <input type="password" id="inputVerifyPassword" name="password">
+                        <input type="password" id="inputVerifyPassword" name="passwd">
                     </div>
                 </form>
             </div>
@@ -86,6 +89,7 @@
 <script src="js/include.js" type="application/javascript"></script>
 
 <script src="js/getParameter.js" type="application/javascript"></script>
+<script src="js/jquery.md5.min.js" type="application/javascript"></script>
 
 <script type="application/javascript">
     $(function () {
@@ -93,11 +97,12 @@
             if(data==null) {
                 location.href = "/login.html";
             }else {
-                $("input[name='uid']").val(data.uid);
-                $("#inputUserName").val(data.username);
-                $("#inputPassword").val(data.password);
-                $("#inputName").val(data.name);
-                if(data.sex) {
+                $("input[name='userAccount']").val(data.userAccount);
+                $("#userAccount").html(data.userAccount);
+                $("#inputPassword").val(data.passwd);
+                $("#inputUserName").val(data.userName);
+                $("#inputAge").val(data.age);
+                if(data.gender==='FEMALE') {
                     $("#radio-female").attr('checked','true');
                 }else {
                     $("#radio-male").attr('checked','true');
@@ -109,17 +114,13 @@
     })
 
     function changeUserInfo(button) {
-        $("input[name='username']").val($("#inputUserName").val());
+        $("input[name='userName']").val($("#inputUserName").val());
         $("#verify-modal").modal('show');
-/*
-        $("fieldset").removeAttr('disabled')
-        $(button).hide();
-        $("#setting-submit").show();
-*/
     }
 
     function confirmVerify() {
-        $.get("/user/verify",$("#verify-form").serialize(),function (data) {
+        var password = $.MD5($("#userAccount").html()+'#'+$("#inputVerifyPassword").val());
+        $.get("/user/verify",{'userAccount':$("#userAccount").html(), 'passwd':password},function (data) {
             if (data.flag){
                 $("fieldset").removeAttr('disabled')
                 $("#btn-setting").hide();

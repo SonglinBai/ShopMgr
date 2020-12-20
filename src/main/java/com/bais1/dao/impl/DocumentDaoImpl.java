@@ -4,6 +4,7 @@ import com.bais1.dao.DocumentDao;
 import com.bais1.domain.Document;
 import com.bais1.domain.DocumentDetail;
 import com.bais1.domain.DocumentType;
+import com.bais1.domain.User;
 import com.bais1.util.JDBCUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -28,12 +29,15 @@ public class DocumentDaoImpl implements DocumentDao {
         StringBuilder stringBuilder = new StringBuilder(sql);
         //用于存储参数信息
         ArrayList params = new ArrayList<>();
+        String typeStr = null;
+        if(type!=null)
+            typeStr = type.equals(DocumentType.SALE)?"SALE":"PURCHASE";
 
-        if (type!=null) {
+        if (typeStr!=null) {
             stringBuilder.append(" and type = ? ");
-            params.add(type);
+            params.add(typeStr);
         }
-        if (!user.equals("0")) {
+        if (user!=null&&user.length()>0) {
             stringBuilder.append(" and userAccount = ?");
             params.add(user);
         }
@@ -48,14 +52,18 @@ public class DocumentDaoImpl implements DocumentDao {
         StringBuilder stringBuilder = new StringBuilder(sql);
         //用于存储参数信息
         ArrayList params = new ArrayList<>();
-
-        if (type!=null) {
-            stringBuilder.append(" and ex_im = ?");
-            params.add(type);
+        String typeStr = null;
+        if(type!=null) {
+            typeStr = type.equals(DocumentType.SALE) ? "SALE" : "PURCHASE";
         }
-        if (!user.equals("0")) {
-            stringBuilder.append(" and user = ?");
-            params.add(user);
+
+        if (typeStr!=null) {
+            stringBuilder.append(" and type = ?");
+            params.add(typeStr);
+        }
+        if (user.length()>0) {
+            stringBuilder.append(" and userName like ?");
+            params.add("%"+user+"%");
         }
         stringBuilder.append(" limit ?,?");
         params.add(start);
@@ -78,48 +86,16 @@ public class DocumentDaoImpl implements DocumentDao {
 
         return template.query(sql,new BeanPropertyRowMapper<DocumentDetail>(DocumentDetail.class),documentId);
     }
-/*
 
-获取自增长id
-public Emp create(final Emp emp){
-		final String sql = "insert into Emp (age,name)values(?,?)";
-		KeyHolder holder = new GeneratedKeyHolder();
-		jdbc.update(new PreparedStatementCreator() {
-			@Override
-			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-				PreparedStatement ps = connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
-				ps.setInt(1, emp.getAge());
-				ps.setString(2, emp.getName());
-				return ps;
-			}
-		},holder);
-
-		int newEmpId= holder.getKey().intValue();
-		emp.setId(newEmpId);
-		return emp;
-	}
- */
-
-
-    //TODO: auto generate documentId
     @Override
-    public String create(final DocumentType type, final String user, final Date time) {
-        final String sql = "insert into tb_document (type, userAccount, orderTime) VALUES (?,?,?)";
-        KeyHolder holder = new GeneratedKeyHolder();
-        String did;
-
+    public String create(final DocumentType type, User user,float price, float discount, String note, Date time) {
+        String sql = "insert into tb_document (documentId, type, userAccount,price,discount, note, orderTime) VALUES (?,?,?,?,?,?,?)";
+        String t = type.equals(DocumentType.SALE)?"S":"P";
+        String did = t+ String.valueOf(time.getTime());
+        String typeStr;
         try {
-            template.update(new PreparedStatementCreator() {
-                @Override
-                public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-                    PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                    ps.setString(1,type.name());
-                    ps.setString(2,user);
-                    ps.setTimestamp(3,new Timestamp(time.getTime()));
-                    return ps;
-                }
-            },holder);
-            did = holder.getKey().toString();
+            typeStr=type.equals(DocumentType.SALE)?"SALE":"PURCHASE";
+            template.update(sql,did,typeStr,user.getUserAccount(),price,discount,note, new Timestamp(time.getTime()));
         } catch (DataAccessException e) {
             return null;
         };
@@ -127,11 +103,11 @@ public Emp create(final Emp emp){
     }
 
     @Override
-    public boolean createDetail(String documentId, String good, int amount) {
-        String sql = "insert into tb_document_detail (documentId, goodId, amount) values (?,?,?)";
+    public boolean createDetail(String documentId, String good, int amount,float price) {
+        String sql = "insert into tb_document_detail (documentId, goodId, amount,price) values (?,?,?,?)";
 
         try {
-            template.update(sql,documentId,good,amount);
+            template.update(sql,documentId,good,amount,price);
         } catch (DataAccessException e) {
             return false;
         }return true;

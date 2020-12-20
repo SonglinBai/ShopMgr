@@ -23,11 +23,11 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="selectExIm">出库/入库</label>
+                <label for="selectExIm">单据类型</label>
                 <select class="form-control" id="selectExIm" name="ex_im">
                     <option value="0">全部</option>
-                    <option value="1">入库</option>
-                    <option value="2">出库</option>
+                    <option value="1">销售</option>
+                    <option value="2">进货</option>
                 </select>
             </div>
             <button class="btn btn-default" onclick="javascript:search()">查询</button>
@@ -38,8 +38,9 @@
             <thead>
             <tr>
                 <th>单据ID</th>
-                <th>出库/入库</th>
+                <th>单据类型</th>
                 <th>用户</th>
+                <th>单据金额</th>
                 <th>时间</th>
                 <th>详情</th>
             </tr>
@@ -92,7 +93,7 @@
     $(function () {
         //获取请求的cid，gname
         var user = getParameter("user");
-        var exim = getParameter("exim");
+        var type = getParameter("type");
         var currentPage = getParameter("currentPage");
 
         $.get("/user/getAll", {}, function (data) {
@@ -107,14 +108,14 @@
             $("#selectUser").html(options);
         })
 
-        load(user, exim, currentPage);
+        load(user, type, currentPage);
 
     })
 
 
-    function load(user, exim, currentPage) {
+    function load(user, type, currentPage) {
         //发送ajax请求
-        $.get("document/pageQuery", {user: user, ex_im: exim, currentPage: currentPage}, function (pb) {
+        $.get("document/pageQuery", {user: user, type: type, currentPage: currentPage}, function (pb) {
                 //设置总页数和总记录数
                 $("#totalPage").html(pb.totalPage);
                 $("#totalCount").html(pb.totalCount);
@@ -122,7 +123,7 @@
                 //设置分页条
                 var lis = "";
 
-                var fristPage = '<li onclick="javascipt:load(' + user + ',' + exim + ',\'' + 1 + '\')"><a href="javascript:void(0)">首页</a></li>';
+                var fristPage = '<li onclick="javascipt:load(' + user + ',' + type + ',\'' + 1 + '\')"><a href="javascript:void(0)">首页</a></li>';
 
                 //计算上一页的页码
                 var beforeNum = pb.currentPage - 1;
@@ -130,7 +131,7 @@
                     beforeNum = 1;
                 }
 
-                var beforePage = '<li  onclick="javascipt:load(' + user + ',' + exim + ',\'' + beforeNum + '\')"><a href="javascript:void(0)">&ll;</a></li>';
+                var beforePage = '<li  onclick="javascipt:load(' + user + ',' + type + ',\'' + beforeNum + '\')"><a href="javascript:void(0)">&ll;</a></li>';
 
                 lis += fristPage;
                 lis += beforePage;
@@ -177,16 +178,16 @@
                     //判断当前页码是否等于i
                     if (pb.currentPage == i) {
 
-                        li = '<li class="active" onclick="javascipt:load(' + user + ',' + exim + ',' + i + ')"><a href="javascript:void(0)">' + i + '</a></li>';
+                        li = '<li class="active" onclick="javascipt:load(' + user + ',' + type + ',' + i + ')"><a href="javascript:void(0)">' + i + '</a></li>';
 
                     } else {
                         //创建页码的li
-                        li = '<li onclick="javascipt:load(' + user + ',' + exim + ',' + i + ')"><a href="javascript:void(0)">' + i + '</a></li>';
+                        li = '<li onclick="javascipt:load(' + user + ',' + type + ',' + i + ')"><a href="javascript:void(0)">' + i + '</a></li>';
                     }
                     //拼接字符串
                     lis += li;
                 }
-                var lastPage = '<li onclick="javascipt:load(' + user + ',' + exim + ',' + pb.totalPage + ')"><a href="javascript:void(0)">末页</a></li>';
+                var lastPage = '<li onclick="javascipt:load(' + user + ',' + type + ',' + pb.totalPage + ')"><a href="javascript:void(0)">末页</a></li>';
 
                 //计算下一页的页码
                 var nextNum = pb.currentPage + 1;
@@ -194,7 +195,7 @@
                     nextNum = pb.totalPage;
                 }
 
-                var nextPage = '<li  onclick="javascipt:load(' + user + ',' + exim + ',' + nextNum + ')"><a href="javascript:void(0)">&gg;</a></li>';
+                var nextPage = '<li  onclick="javascipt:load(' + user + ',' + type + ',' + nextNum + ')"><a href="javascript:void(0)">&gg;</a></li>';
 
                 lis += nextPage;
                 lis += lastPage;
@@ -206,21 +207,22 @@
                 var trs = "";
                 for (var i = 0; i < pb.list.length; i++) {
                     var document = pb.list[i];
-                    var ex_im_str = '未知';
-                    if (document.ex_im == 1) {
-                        ex_im_str = "入库";
-                    } else if (document.ex_im == 2) {
-                        ex_im_str = "出库"
+                    var type = '未知';
+                    if (document.type == 'SALE') {
+                        type = "销售";
+                    } else if (document.type == 'PURCHASE') {
+                        type = "进货"
                     }
-                    //timestamp4.toLocaleDateString().replace(/\//g, "-") + " " + timestamp4.toTimeString().substr(0, 8)
-                    var time = new Date(document.time);
+                    var price = document.price-document.discount;
+                    var time = new Date(document.orderTime);
                     var timeFormatted = time.toLocaleDateString().replace(/\//g, "-") + " " + time.toTimeString().substr(0, 8)
                     var tr = '            <tr>\n' +
-                        '                <td>' + document.did + '</td>\n' +
-                        '                <td>' + ex_im_str + '</td>\n' +
-                        '                <td>' + document.u.username + '</td>\n' +
+                        '                <td>' + document.documentId + '</td>\n' +
+                        '                <td>' + type + '</td>\n' +
+                        '                <td>' + document.user.userName + '</td>\n' +
+                        '                <td>' + price + '</td>\n' +
                         '                <td>' + timeFormatted + '</td>\n' +
-                        '                <td><a href="javascript:detail(' + document.did + ')">详情</a></td>\n' +
+                        '                <td><a href="javascript:detail(\'' + document.documentId + '\')">详情</a></td>\n' +
                         '            </tr>\n';
                     trs += tr;
                 }
@@ -252,8 +254,8 @@
                 var detail = data[i];
 
                 var tr = '                    <tr>\n' +
-                    '                        <td>'+detail.good+'</td>\n' +
-                    '                        <td>'+detail.g.name+'</td>\n' +
+                    '                        <td>'+detail.goodId+'</td>\n' +
+                    '                        <td>'+detail.good.goodName+'</td>\n' +
                     '                        <td>'+detail.amount+'</td>\n' +
                     '                    </tr>\n'
                 trs += tr;

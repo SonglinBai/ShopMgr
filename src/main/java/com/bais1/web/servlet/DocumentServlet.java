@@ -23,7 +23,7 @@ public class DocumentServlet extends BaseServlet{
         //1.接受参数
         String currentPageStr = request.getParameter("currentPage");
         String pageSizeStr = request.getParameter("pageSize");
-        String ex_imStr = request.getParameter("ex_im");
+        String typeStr = request.getParameter("type");
         String userStr = request.getParameter("user");
 
 
@@ -42,15 +42,15 @@ public class DocumentServlet extends BaseServlet{
             pageSize = 5;
         }
 
-        DocumentType ex_im;
-        if(ex_imStr != null && ex_imStr.length() > 0){
-            ex_im = ex_imStr.equals("SALE")?DocumentType.SALE:DocumentType.PURCHASE;
+        DocumentType type;
+        if(typeStr != null && typeStr.length() > 0){
+            type = typeStr.equals("SALE")?DocumentType.SALE:DocumentType.PURCHASE;
         }else{
-            ex_im = null;
+            type = null;
         }
 
         //3. 调用service查询PageBean对象
-        PageBean<Document> pb = documentService.pageQuery(ex_im,userStr,currentPage, pageSize);
+        PageBean<Document> pb = documentService.pageQuery(type,userStr,currentPage, pageSize);
 
         //4. 将pageBean对象序列化为json，返回
         writeValue(pb,response);
