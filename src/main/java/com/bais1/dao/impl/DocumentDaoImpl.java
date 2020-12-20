@@ -61,9 +61,9 @@ public class DocumentDaoImpl implements DocumentDao {
             stringBuilder.append(" and type = ?");
             params.add(typeStr);
         }
-        if (user.length()>0) {
-            stringBuilder.append(" and userName like ?");
-            params.add("%"+user+"%");
+        if (user!=null&&user.length()>0) {
+            stringBuilder.append(" and userAccount = ?");
+            params.add(user);
         }
         stringBuilder.append(" limit ?,?");
         params.add(start);

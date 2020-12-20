@@ -138,6 +138,7 @@
                     <configuration>
                         <path>/</path>
                         <port>80</port>
+                        <uriEncoding>utf-8</uriEncoding>
                     </configuration>
                 </plugin>
                 <plugin>

@@ -200,7 +200,7 @@
         }
 
         $.get("/category/getAll", {}, function (data) {
-            var options = '<option selected value="0">全部</option>';
+            var options = '<option selected value="">全部</option>';
             var ct;
             for (var i = 0; i < data.length; i++) {
                 ct = data[i];
@@ -212,7 +212,7 @@
         })
 
         $.get("/supplier/getAll",{}, function (data) {
-            var options = '<option selected value="0">全部</option>';
+            var options = '<option selected value="">全部</option>';
             var supplier;
             for (var i = 0; i < data.length; i++) {
                 supplier = data[i];
@@ -376,7 +376,7 @@
             $("#edit-inputGname").val(data.goodName);
             $("#edit-inputDescription").val(data.description);
             $.get("/category/getAll", {}, function (data) {
-                var options = '<option value="0">未分类</option>';
+                var options = '<option value="">未分类</option>';
                 var ct;
                 for (var i = 0; i < data.length; i++) {
                     ct = data[i];
@@ -391,7 +391,7 @@
                 $("#edit-category").html(options);
             });
             $.get("/supplier/getAll", {}, function (data) {
-                var options = '<option value="0">未指定</option>';
+                var options = '<option value="">未指定</option>';
                 var supplier;
                 for (var i = 0; i< data.length; i++) {
                     supplier = data[i];
@@ -488,7 +488,7 @@
         //     $("#edit-inputGid").val(data);
         // });
         $.get("/category/getAll", {}, function (data) {
-            var options = '<option value="0">未分类</option>';
+            var options = '<option value="">未分类</option>';
             var ct;
             for (var i = 0; i < data.length; i++) {
                 ct = data[i];
@@ -500,7 +500,7 @@
         });
         $("#edit-category").val("0");
         $.get("/supplier/getAll", {}, function (data) {
-            var options = '<option value="0">未指定</option>';
+            var options = '<option value="">未指定</option>';
             var supplier;
             for (var i = 0; i < data.length; i++) {
                 supplier = data[i];

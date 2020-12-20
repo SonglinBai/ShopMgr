@@ -157,6 +157,13 @@ public class GoodServlet extends BaseServlet {
         String retailPriceStr = request.getParameter("retailPrice");
         String purchasePriceStr = request.getParameter("purchasePrice");
 
+        if(cidStr.length()==0) {
+            cidStr=null;
+        }
+        if(supplierId.length()==0) {
+            supplierId=null;
+        }
+
         float retailPrice = 0;
         if (retailPriceStr!=null && retailPriceStr.length()>0)
             retailPrice = Float.parseFloat(retailPriceStr);
@@ -165,7 +172,7 @@ public class GoodServlet extends BaseServlet {
         if (purchasePriceStr!=null && retailPriceStr.length()>0)
             purchasePrice = Float.parseFloat(purchasePriceStr);
 
-        Good good = new Good(gidStr, name, cidStr, retailPrice, purchasePrice, supplierId, null, description);
+        Good good = new Good(gidStr, name, cidStr, retailPrice, purchasePrice, supplierId, GoodStatus.ENABLE, description);
         ResultInfo info = new ResultInfo();
         if (goodService.isIdExist(good)) {
             info.setFlag(false);

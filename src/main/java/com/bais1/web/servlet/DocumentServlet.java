@@ -25,6 +25,7 @@ public class DocumentServlet extends BaseServlet{
         String pageSizeStr = request.getParameter("pageSize");
         String typeStr = request.getParameter("type");
         String userStr = request.getParameter("user");
+        if (userStr.length()==0) userStr=null;
 
 
         //2.处理参数

@@ -1,3 +1,4 @@
+create database ShopMgr;
 use ShopMgr;
 create table tb_category
 (
@@ -5,6 +6,15 @@ create table tb_category
         primary key,
     categoryName varchar(10)  not null,
     description  varchar(100) null
+);
+
+create table tb_supplier
+(
+    supplierId   varchar(10)  not null
+        primary key,
+    supplierName varchar(20)  not null,
+    address      varchar(100) null,
+    phone        char(11)     null
 );
 
 create table tb_good
@@ -18,21 +28,16 @@ create table tb_good
     inventory     int                        default 0        not null,
     supplierId    varchar(10)                                 null,
     status        enum ('ENABLE', 'DISABLE') default 'ENABLE' not null,
-    description   varchar(100)                                null
-);
-
-create table tb_supplier
-(
-    supplierId   varchar(10)  not null
-        primary key,
-    supplierName varchar(20)  not null,
-    address      varchar(100) null,
-    phone        char(11)     null
+    description   varchar(100)                                null,
+    constraint tb_good_tb_category_categoryId_fk
+        foreign key (categoryId) references tb_category (categoryId),
+    constraint tb_good_tb_supplier_supplierId_fk
+        foreign key (supplierId) references tb_supplier (supplierId)
 );
 
 create table tb_user
 (
-    userAccount char(11)                                                                                              not null
+    userAccount varchar(11)                                                                                              not null
         primary key,
     userName    varchar(20)                                                                                           not null,
     passwd      char(32)                                                                                              not null,
@@ -41,16 +46,17 @@ create table tb_user
     userRole    enum ('ADMINISTRATOR', 'EMPLOYEE')                                              default 'EMPLOYEE'    not null,
     status      enum ('ENABLE', 'DISABLE', 'UNACTIVATED')                                       default 'UNACTIVATED' not null,
     email       varchar(30)                                                                                           not null,
-    activeCode  varchar(30)                                                                                           null
+    activeCode  varchar(50)                                                                                           null
 );
 
 create table tb_document
 (
-    documentId  varchar(10)                                   not null
+    documentId  varchar(14)                                   not null
         primary key,
     price       decimal(10, 2) default 0.00                   not null,
+    discount    decimal(10, 2) default 0.00                   not null,
     orderTime   datetime       default CURRENT_TIMESTAMP      not null,
-    userAccount varchar(10)                                   not null,
+    userAccount varchar(11)                                      not null,
     type        enum ('SALE', 'PURCHASE', 'IMPORT', 'EXPORT') not null,
     note        varchar(100)                                  null,
     constraint tb_document_tb_user_userAccount_fk
@@ -59,7 +65,7 @@ create table tb_document
 
 create table tb_document_detail
 (
-    documentId varchar(10)                 not null,
+    documentId varchar(14)                 not null,
     goodId     varchar(10)                 not null,
     amount     int                         not null,
     price      decimal(10, 2) default 0.00 not null,

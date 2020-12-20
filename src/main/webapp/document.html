@@ -25,9 +25,9 @@
             <div class="form-group">
                 <label for="selectExIm">单据类型</label>
                 <select class="form-control" id="selectExIm" name="ex_im">
-                    <option value="0">全部</option>
-                    <option value="1">销售</option>
-                    <option value="2">进货</option>
+                    <option value="">全部</option>
+                    <option value="SALE">销售</option>
+                    <option value="PURCHASE">进货</option>
                 </select>
             </div>
             <button class="btn btn-default" onclick="javascript:search()">查询</button>
@@ -97,11 +97,11 @@
         var currentPage = getParameter("currentPage");
 
         $.get("/user/getAll", {}, function (data) {
-            var options = '<option selected value="0">全部</option>';
+            var options = '<option selected value="">全部</option>';
             var user;
             for (var i = 0; i < data.length; i++) {
                 user = data[i];
-                option = '<option value="' + user.uid + '">' + user.username + '</option>'
+                option = '<option value="' + user.userAccount + '">' + user.userName + '</option>'
                 options += option;
             }
 
