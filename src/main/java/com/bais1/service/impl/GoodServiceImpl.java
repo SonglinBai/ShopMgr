@@ -11,10 +11,7 @@ import com.bais1.dao.impl.SupplierDaoImpl;
 import com.bais1.domain.*;
 import com.bais1.service.GoodService;
 
-import java.util.Date;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GoodServiceImpl implements GoodService {
     GoodDao goodDao = new GoodDaoImpl();
@@ -86,11 +83,10 @@ public class GoodServiceImpl implements GoodService {
     }
 
     @Override
-    public boolean purchaseGood(Map<String, Integer> goods,float realPrice,String note, User user) {
+    public boolean purchaseGood(Map<String, Integer> goods,String note, User user) {
         boolean flag = true;
         float price = originPrice(goods,DocumentType.PURCHASE);
-        float discount = price-realPrice;
-        String documentId = documentDao.create(DocumentType.PURCHASE, user,price,discount,note, new Date(System.currentTimeMillis()));
+        String documentId = documentDao.create(DocumentType.PURCHASE, user,price,note, new Date(System.currentTimeMillis()));
         if (documentId == null) flag = false;
         for (Map.Entry<String, Integer> good : goods.entrySet()) {
             if (!documentDao.createDetail(documentId, good.getKey(), good.getValue(), originPrice(good.getKey(),good.getValue(),DocumentType.PURCHASE)) || !goodDao.add(good.getKey(), good.getValue()))
@@ -100,11 +96,10 @@ public class GoodServiceImpl implements GoodService {
     }
 
     @Override
-    public boolean saleGood(Map<String, Integer> goods,float realPrice,String note, User user) {
+    public boolean saleGood(Map<String, Integer> goods,String note, User user) {
         boolean flag = true;
         float price = originPrice(goods,DocumentType.SALE);
-        float discount = price-realPrice;
-        String documentId = documentDao.create(DocumentType.SALE, user,price,discount,note, new Date(System.currentTimeMillis()));
+        String documentId = documentDao.create(DocumentType.SALE, user,price,note, new Date(System.currentTimeMillis()));
         if (documentId == null) flag = false;
         for (Map.Entry<String, Integer> good : goods.entrySet()) {
             if (!documentDao.createDetail(documentId, good.getKey(), good.getValue(),originPrice(good.getKey(),good.getValue(),DocumentType.SALE)) || !goodDao.reduce(good.getKey(), good.getValue()))
@@ -163,6 +158,19 @@ public class GoodServiceImpl implements GoodService {
         }else {
             return oGood.getPurchasePrice()*amount;
         }
+    }
+    @Override
+    public Map<String, Integer> getSaleReport(String dateStart, String dateEnd) {
+        List<DocumentDetail> documentList = documentDao.getBetweenDate(dateStart, dateEnd);
+        Map<String, Integer> map = new HashMap<>();
+
+        for (DocumentDetail detail:documentList){
+            String goodId = detail.getGoodId();
+            if(map.containsKey(goodId)){
+                map.replace(goodId,map.get(goodId)+detail.getAmount());
+            }else map.put(detail.getGoodId(),detail.getAmount());
+        }
+        return map;
     }
 
 }

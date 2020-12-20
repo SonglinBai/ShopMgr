@@ -24,13 +24,15 @@ public interface GoodService {
 
     boolean deleteByArray(ArrayList<String> goodIds);
 
-    boolean purchaseGood(Map<String,Integer> goods,float realPrice,String note, User user);
+    boolean purchaseGood(Map<String,Integer> goods,String note, User user);
 
-    boolean saleGood(Map<String,Integer> goods,float realPrice,String note, User user);
+    boolean saleGood(Map<String,Integer> goods,String note, User user);
 
     List<Good> getByArray(ArrayList<String> goodIds);
 
     boolean isIdExist(Good good);
 
     boolean isUsed(String gid);
+
+    Map<String, Integer> getSaleReport(String dateStart, String dateEnd);
 }

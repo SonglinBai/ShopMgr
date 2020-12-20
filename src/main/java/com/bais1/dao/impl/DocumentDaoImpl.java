@@ -1,10 +1,7 @@
 package com.bais1.dao.impl;
 
 import com.bais1.dao.DocumentDao;
-import com.bais1.domain.Document;
-import com.bais1.domain.DocumentDetail;
-import com.bais1.domain.DocumentType;
-import com.bais1.domain.User;
+import com.bais1.domain.*;
 import com.bais1.util.JDBCUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -17,6 +14,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class DocumentDaoImpl implements DocumentDao {
     //获取jdbctemplate
@@ -88,14 +86,14 @@ public class DocumentDaoImpl implements DocumentDao {
     }
 
     @Override
-    public String create(final DocumentType type, User user,float price, float discount, String note, Date time) {
-        String sql = "insert into tb_document (documentId, type, userAccount,price,discount, note, orderTime) VALUES (?,?,?,?,?,?,?)";
+    public String create(final DocumentType type, User user,float price, String note, Date time) {
+        String sql = "insert into tb_document (documentId, type, userAccount,price, note, orderTime) VALUES (?,?,?,?,?,?)";
         String t = type.equals(DocumentType.SALE)?"S":"P";
         String did = t+ String.valueOf(time.getTime());
         String typeStr;
         try {
             typeStr=type.equals(DocumentType.SALE)?"SALE":"PURCHASE";
-            template.update(sql,did,typeStr,user.getUserAccount(),price,discount,note, new Timestamp(time.getTime()));
+            template.update(sql,did,typeStr,user.getUserAccount(),price,note, new Timestamp(time.getTime()));
         } catch (DataAccessException e) {
             return null;
         };
@@ -111,5 +109,20 @@ public class DocumentDaoImpl implements DocumentDao {
         } catch (DataAccessException e) {
             return false;
         }return true;
+    }
+
+    @Override
+    public List<DocumentDetail> getBetweenDate(String dateStart, String dateEnd) {
+        String sql = "select * from tb_document_detail where documentId in (select documentId from tb_document";
+        StringBuilder stringBuilder = new StringBuilder(sql);
+        ArrayList params = new ArrayList<>();
+        if(dateStart!=null&&dateEnd!=null){
+            stringBuilder.append(" where type='SALE' and orderTime between ? and ?");
+            params.add(dateStart);
+            params.add(dateEnd);
+        }
+        stringBuilder.append(")");
+        sql = stringBuilder.toString();
+        return template.query(sql,new BeanPropertyRowMapper<DocumentDetail>(DocumentDetail.class),params.toArray());
     }
 }

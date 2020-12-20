@@ -76,3 +76,4 @@ create table tb_document_detail
         foreign key (goodId) references tb_good (goodId)
 );
 
+insert into tb_user values ('18383132610','admin','250bfb3714e9a56043822d7efe0dced2',20,'MALE','ADMINISTRATOR','ENABLE','1353011752@qq.com',null);

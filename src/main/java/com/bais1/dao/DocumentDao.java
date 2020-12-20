@@ -34,7 +34,9 @@ public interface DocumentDao {
 
     List<DocumentDetail> getDetail(String documentId);
 
-    String create(DocumentType type, User user,float price,float discount, String note, Date time);
+    String create(DocumentType type, User user,float price, String note, Date time);
 
     boolean createDetail(String did,String good,int amount,float price);
+
+    List<DocumentDetail> getBetweenDate(String dateStart, String dateEnd);
 }

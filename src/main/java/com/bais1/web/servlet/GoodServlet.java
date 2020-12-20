@@ -12,6 +12,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @WebServlet("/good/*")
@@ -200,10 +203,7 @@ public class GoodServlet extends BaseServlet {
 
         while (gids.hasMoreElements()) {
             gidStr = (String) gids.nextElement();
-            if(gidStr.equals("realPrice")){
-                realPrice=Float.parseFloat(request.getParameter(gidStr));
-                continue;
-            }else if(gidStr.equals("note")) {
+            if(gidStr.equals("note")) {
                 note=request.getParameter(gidStr);
                 continue;
             }
@@ -213,7 +213,7 @@ public class GoodServlet extends BaseServlet {
                 map.put(gidStr, Integer.parseInt(amountStr));
             else continue;
         }
-        goodService.purchaseGood(map,realPrice,note, user);
+        goodService.purchaseGood(map,note, user);
     }
 
     public void sale(HttpServletRequest request, HttpServletResponse response) {
@@ -228,10 +228,7 @@ public class GoodServlet extends BaseServlet {
 
         while (gids.hasMoreElements()) {
             gidStr = (String) gids.nextElement();
-            if(gidStr.equals("realPrice")){
-                realPrice=Float.parseFloat(request.getParameter(gidStr));
-                continue;
-            }else if(gidStr.equals("note")) {
+            if(gidStr.equals("note")) {
                 note=request.getParameter(gidStr);
                 continue;
             }
@@ -240,7 +237,7 @@ public class GoodServlet extends BaseServlet {
                 map.put(gidStr, Integer.parseInt(amountStr));
             else continue;
         }
-        goodService.saleGood(map,realPrice,note, user);
+        goodService.saleGood(map,note, user);
     }
 
     public void getByArray(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -253,5 +250,20 @@ public class GoodServlet extends BaseServlet {
         List<Good> goods = goodService.getByArray(gids);
 
         writeValue(goods, response);
+    }
+
+    public void getSaleReport(HttpServletRequest request, HttpServletResponse response) throws IOException, ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd");
+        String dateStart = request.getParameter("dateStart");
+        String dateEnd = request.getParameter("dateEnd");
+
+        if(dateStart.equals("")) {
+            dateStart = null;
+        }
+        if(dateEnd.equals("")) {
+            dateEnd = null;
+        }
+
+        writeValue(goodService.getSaleReport(dateStart, dateEnd),response);
     }
 }
