@@ -2,6 +2,7 @@ package com.bais1.dao.impl;
 
 import com.bais1.dao.GoodDao;
 import com.bais1.domain.Good;
+import com.bais1.domain.GoodStatus;
 import com.bais1.util.JDBCUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -75,10 +76,28 @@ public class GoodDaoImpl implements GoodDao {
 
     @Override
     public boolean edit(String goodId, Good good) {
-        String sql = "update tb_good set goodId=?,goodName=?,categoryId=?, supplierId=?, retailPrice=?, purchasePrice=?, status=?, description=? where goodId=?";
-
+        String sql = "update tb_good set goodId=?,goodName=?, retailPrice=?, purchasePrice=?, status=?, description=?";
+        StringBuilder stringBuilder = new StringBuilder(sql);
+        ArrayList params = new ArrayList();
+        params.add(good.getGoodId());
+        params.add(good.getGoodName());
+        params.add(good.getRetailPrice());
+        params.add(good.getPurchasePrice());
+        params.add(good.getStatus().toString());
+        params.add(good.getDescription());
+        if(good.getCategoryId()!=null&&good.getCategoryId().length()>0) {
+            stringBuilder.append(", categoryId=?");
+            params.add(good.getCategoryId());
+        }
+        if(good.getSupplierId()!=null&&good.getSupplierId().length()>0) {
+            stringBuilder.append(", supplierId=?");
+            params.add(good.getSupplierId());
+        }
+        stringBuilder.append(" where goodId=?");
+        params.add(goodId);
+        sql = stringBuilder.toString();
         try {
-            template.update(sql, good.getGoodId(), good.getGoodName(), good.getCategoryId(), good.getSupplierId(), good.getRetailPrice(), good.getPurchasePrice(),good.getStatus().toString(), good.getDescription(), goodId);
+            template.update(sql, params.toArray());
         } catch (DataAccessException e) {
             return false;
         }

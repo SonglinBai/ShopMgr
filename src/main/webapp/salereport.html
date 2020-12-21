@@ -19,24 +19,6 @@
     <div id="errorMsg" class="alert alert-danger" role="alert" style="display: none;"></div>
     <div class="tool-container">
         <form class="form-inline" action="javascript:void(0)">
-<!--            <div class="form-group">-->
-<!--                <label for="inputGname">商品编号</label>-->
-<!--                <input type="text" class="form-control" id="inputGid" placeholder="商品ID">-->
-<!--            </div>-->
-<!--            <div class="form-group">-->
-<!--                <label for="inputGname">商品名</label>-->
-<!--                <input type="text" class="form-control" id="inputGname" placeholder="商品名">-->
-<!--            </div>-->
-<!--            <div class="form-group">-->
-<!--                <label for="selectCatagory">分类</label>-->
-<!--                <select class="form-control" id="selectCatagory">-->
-<!--                </select>-->
-<!--            </div>-->
-<!--            <div class="form-group">-->
-<!--                <label for="selectSupplier">供应商</label>-->
-<!--                <select class="form-control" id="selectSupplier">-->
-<!--                </select>-->
-<!--            </div>-->
             <div class="form-group">
                 <label for="dateStart">起始日期</label>
                 <input type="date" class="form-control" id="dateStart">
@@ -46,10 +28,6 @@
                 <input type="date" class="form-control" id="dateEnd">
             </div>
             <button class="btn btn-default" onclick="javascript:search()">查询</button>
-<!--            <div style="display: inline;">-->
-<!--                <button type="button" class="btn btn-primary" onclick="newGood()">新建</button>-->
-<!--                <button type="button" class="btn btn-danger" onclick="deleteSelected()">删除选中</button>-->
-<!--            </div>-->
         </form>
     </div>
     <div class="table-container">
@@ -62,9 +40,15 @@
                 <th>供应商</th>
                 <th>零售价</th>
                 <th>销量</th>
+                <th>利润</th>
             </tr>
             </thead>
             <tbody id="goodBody">
+            <tr id="collect">
+                <td colspan="5">总计</td>
+                <td id="count">0</td>
+                <td id="allProfit">0</td>
+            </tr>
             </tbody>
         </table>
     </div>
@@ -92,7 +76,7 @@
         var dateStart = $("#dateStart").val();
         var dateEnd = $("#dateEnd").val();
 
-        var goodBody = $("#goodBody");
+        var goodBody = $("#goodBody")[0];
         $.get("/good/getSaleReport",{'dateStart':dateStart,'dateEnd':dateEnd},function (map) {
             for(var goodId in map){
                 $.get("/good/getById",{'gid':goodId},function (data){
@@ -107,18 +91,40 @@
                     } else {
                         spname = data.supplier.supplierName;
                     }
+                    var retailPrice = data.retailPrice;
+                    var purchasePrice = data.purchasePrice;
+                    var amount = map[goodId];
+                    var profit = amount*(retailPrice-purchasePrice)
+                    count = count+amount;
+                    allProfit = allProfit+profit;
 
                     tr.innerHTML =
                         '                <td>'+data.goodId+'</td>\n' +
                         '                <td>'+data.goodName+'</td>\n' +
                         '                <td>'+ctname+'</td>\n' +
                         '                <td>'+spname+'</td>\n' +
-                        '                <td>'+data.retailPrice+'</td>\n' +
-                        '                <td>'+map[goodId]+'</td>\n';
-                    goodBody.append(tr);
+                        '                <td>'+retailPrice+'</td>\n' +
+                        '                <td class="amount">'+amount+'</td>\n' +
+                        '                <td class="profit">'+profit+'</td>\n';
+
+                    goodBody.insertBefore(tr,$("#collect")[0]);
+                    updateCollect();
                 });
             }
         });
+    }
+    function updateCollect(){
+        var count = 0;
+        var allProfit = 0;
+        var amounts = $(".amount");
+        var profits = $(".profit");
+
+        for (var i = 0;i<amounts.length;i++) {
+            count+=Number(amounts[i].innerHTML);
+            allProfit+=Number(profits[i].innerHTML);
+        }
+        $("#count").html(count);
+        $("#allProfit").html(allProfit);
     }
 </script>
 </body>
