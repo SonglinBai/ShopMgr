@@ -16,10 +16,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+// 用于操作数据库中的订单数据
 public class DocumentDaoImpl implements DocumentDao {
     //获取jdbctemplate
     private JdbcTemplate template = new JdbcTemplate(JDBCUtils.getDataSource());
 
+    // 获取订单数量
     @Override
     public int getTotalCount(DocumentType type, String user) {
         String sql = "select count(*) from tb_document where 1=1";
@@ -43,6 +45,7 @@ public class DocumentDaoImpl implements DocumentDao {
         return template.queryForObject(sql, Integer.class, params.toArray());
     }
 
+    // 获取分页的订单信息
     @Override
     public List<Document> getByPage(DocumentType type, String user,int start, int pageSize) {
         String sql = "select * from tb_document where 1=1";
@@ -72,12 +75,14 @@ public class DocumentDaoImpl implements DocumentDao {
     }
 
 
+    // 通过订单ID获取订单
     @Override
     public Document getByDid(String documentId) {
         String sql = "select * from tb_document where documentId = ?";
         return template.queryForObject(sql,new BeanPropertyRowMapper<Document>(Document.class),documentId);
     }
 
+    // 通过订单ID获取订单详情
     @Override
     public List<DocumentDetail> getDetail(String documentId) {
         String sql = "select * from tb_document_detail where documentId = ?";
@@ -85,6 +90,7 @@ public class DocumentDaoImpl implements DocumentDao {
         return template.query(sql,new BeanPropertyRowMapper<DocumentDetail>(DocumentDetail.class),documentId);
     }
 
+    // 创建订单
     @Override
     public String create(final DocumentType type, User user,float price, String note, Date time) {
         String sql = "insert into tb_document (documentId, type, userAccount,price, note, orderTime) VALUES (?,?,?,?,?,?)";
@@ -100,6 +106,7 @@ public class DocumentDaoImpl implements DocumentDao {
         return did;
     }
 
+    // 创建订单详情
     @Override
     public boolean createDetail(String documentId, String good, int amount,float price) {
         String sql = "insert into tb_document_detail (documentId, goodId, amount,price) values (?,?,?,?)";
@@ -111,6 +118,7 @@ public class DocumentDaoImpl implements DocumentDao {
         }return true;
     }
 
+    // 通过时间范围获取订单信息
     @Override
     public List<DocumentDetail> getBetweenDate(String dateStart, String dateEnd) {
         String sql = "select * from tb_document_detail where documentId in (select documentId from tb_document";

@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.bais1</groupId>
-    <artifactId>InventoryMgr</artifactId>
+    <artifactId>ShopMgr</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
@@ -181,14 +181,6 @@
             <configuration>
                 <source>7</source>
                 <target>7</target>
-            </configuration>
-        </plugin>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-                <source>8</source>
-                <target>8</target>
             </configuration>
         </plugin>
     </plugins>

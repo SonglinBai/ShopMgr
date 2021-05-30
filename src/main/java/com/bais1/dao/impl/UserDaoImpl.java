@@ -6,17 +6,18 @@ import com.bais1.domain.User;
 import com.bais1.domain.UserRole;
 import com.bais1.domain.UserStatus;
 import com.bais1.util.JDBCUtils;
-import com.sun.tools.javac.jvm.Gen;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
 
+// 用于操作数据库中的用户表
 public class UserDaoImpl implements UserDao {
     //获取jdbcTemplate
     private JdbcTemplate template = new JdbcTemplate(JDBCUtils.getDataSource());
 
+    // 通过账户名查找用户
     @Override
     public User findByUserAccount(String account) {
         User user = null;
@@ -32,6 +33,7 @@ public class UserDaoImpl implements UserDao {
         return user;
     }
 
+    // 通过账户名和密码查询用户信息
     @Override
     public User findByUserAccountAndPassword(String userAccount, String password) {
         User user = null;
@@ -49,6 +51,7 @@ public class UserDaoImpl implements UserDao {
         return user;
     }
 
+    // 新建用户
     @Override
     public boolean save(User user) {
         String userAccount = user.getUserAccount();
@@ -87,6 +90,7 @@ public class UserDaoImpl implements UserDao {
         return true;
     }
 
+    // 启用用户
     @Override
     public boolean enable(User user) {
         try {
@@ -99,6 +103,7 @@ public class UserDaoImpl implements UserDao {
         return true;
     }
 
+    // 通过激活码查找用户
     @Override
     public User findByCode(String code) {
         User user = null;
@@ -112,6 +117,7 @@ public class UserDaoImpl implements UserDao {
         return user;
     }
 
+    // 通过绑好查找用户名
     @Override
     public String getNameByAccount(String account) {
         String sql = "select username from tb_user where userAccount=?";
@@ -119,6 +125,7 @@ public class UserDaoImpl implements UserDao {
         return template.queryForObject(sql,String.class,account);
     }
 
+    // 获取所有用户信息
     @Override
     public List<User> getAll() {
         String sql = "select userAccount,username from tb_user";
@@ -127,6 +134,7 @@ public class UserDaoImpl implements UserDao {
         return users;
     }
 
+    // 更改用户信息
     @Override
     public boolean set(User user) {
         String userAccount = user.getUserAccount();
@@ -155,12 +163,14 @@ public class UserDaoImpl implements UserDao {
         return true;
     }
 
+    // 获取所有员工信息
     @Override
     public List<User> getEmployees() {
         String sql = "select * from tb_user where userRole='EMPLOYEE'";
         return template.query(sql,new BeanPropertyRowMapper<User>(User.class));
     }
 
+    // 通过账号删除用户
     @Override
     public boolean delete(String account) {
         String sql = "delete from tb_user where userAccount=?";

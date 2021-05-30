@@ -63,11 +63,8 @@
 <script type="application/javascript">
     $(function (){
         var date = new Date();
-        var year = date.getFullYear();
-        var month = date.getMonth()+1;
-        var day = date.getDate();
-        $("#dateStart").val("2000-01-01");
-        $("#dateEnd").val(year+'-'+month+'-'+day);
+        $("#dateStart").val('2000-01-01');
+        $("#dateEnd").val(date.toISOString().split('T')[0]);
 
         search();
     });
@@ -77,6 +74,11 @@
         var dateEnd = $("#dateEnd").val();
 
         var goodBody = $("#goodBody")[0];
+        goodBody.innerHTML = '            <tr id="collect">\n' +
+            '                <td colspan="5">总计</td>\n' +
+            '                <td id="count">0</td>\n' +
+            '                <td id="allProfit">0</td>\n' +
+            '            </tr>\n'
         $.get("/good/getSaleReport",{'dateStart':dateStart,'dateEnd':dateEnd},function (map) {
             for(var goodId in map){
                 $.get("/good/getById",{'gid':goodId},function (data){
@@ -93,7 +95,7 @@
                     }
                     var retailPrice = data.retailPrice;
                     var purchasePrice = data.purchasePrice;
-                    var amount = map[goodId];
+                    var amount = map[data.goodId];
                     var profit = amount*(retailPrice-purchasePrice)
                     count = count+amount;
                     allProfit = allProfit+profit;

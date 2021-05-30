@@ -11,9 +11,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
+// 用于操作数据库中的上屏表
 public class GoodDaoImpl implements GoodDao {
     private JdbcTemplate template = new JdbcTemplate(JDBCUtils.getDataSource());
 
+    // 获取商品数量
     @Override
     public int getTotalCount(String goodId, String goodName, String categoryId, String supplierId) {
         String sql = "select count(*) from tb_good where 1=1 ";
@@ -42,6 +44,7 @@ public class GoodDaoImpl implements GoodDao {
         return template.queryForObject(sql, Integer.class, params.toArray());
     }
 
+    // 获取分页的商品信息
     @Override
     public List<Good> getByPage(String goodId, String goodName, String categoryId, String supplierId, int start, int pageSize) {
         String sql = "select * from tb_good where 1=1 ";
@@ -74,6 +77,7 @@ public class GoodDaoImpl implements GoodDao {
         return template.query(sql, new BeanPropertyRowMapper<Good>(Good.class), params.toArray());
     }
 
+    // 修改商品信息
     @Override
     public boolean edit(String goodId, Good good) {
         String sql = "update tb_good set goodId=?,goodName=?, retailPrice=?, purchasePrice=?, status=?, description=?";
@@ -104,6 +108,7 @@ public class GoodDaoImpl implements GoodDao {
         return true;
     }
 
+    // 通过商品ID删除商品
     @Override
     public boolean deleteById(String goodId) {
         String sql = "delete from tb_good where goodId=?";
@@ -116,6 +121,7 @@ public class GoodDaoImpl implements GoodDao {
         return true;
     }
 
+    // 通过商品ID获取商品
     @Override
     public Good getById(String goodId) {
         String sql = "select * from tb_good where goodId=?";
@@ -128,6 +134,7 @@ public class GoodDaoImpl implements GoodDao {
         return good;
     }
 
+    // 获取最大商品ID
     @Override
     public String getMaxId() {
         String sql = "select MAX(goodId) from tb_good";
@@ -140,6 +147,7 @@ public class GoodDaoImpl implements GoodDao {
         return maxId;
     }
 
+    // 创建商品
     @Override
     public boolean create(Good good) {
         String sql = "insert into tb_good (goodId, goodName, categoryId,supplierId, retailPrice, purchasePrice , description) values (?,?,?,?,?,?,?)";
@@ -151,6 +159,7 @@ public class GoodDaoImpl implements GoodDao {
         return true;
     }
 
+    // 通过ID数组删除商品
     @Override
     public boolean deleteByArray(ArrayList<String> gids) {
         String sql = "delete from tb_good where 1!=1";
@@ -170,6 +179,7 @@ public class GoodDaoImpl implements GoodDao {
         return true;
     }
 
+    // 增加指定商品ID的库存
     @Override
     public boolean add(String goodId, int amount) {
         String sql = "update tb_good set inventory=inventory+? where goodId=?";
@@ -182,6 +192,7 @@ public class GoodDaoImpl implements GoodDao {
         return true;
     }
 
+    // 减少指定商品ID的库存
     @Override
     public boolean reduce(String goodId, int amount) {
         String sql = "update tb_good set inventory=inventory-? where goodId=?";
@@ -194,6 +205,7 @@ public class GoodDaoImpl implements GoodDao {
         return true;
     }
 
+    // 通过ID数组获取商品信息
     @Override
     public List<Good> getByArray(ArrayList<String> gids) {
         String sql = "select * from tb_good where 1!=1";
@@ -208,6 +220,7 @@ public class GoodDaoImpl implements GoodDao {
         return template.query(sql, new BeanPropertyRowMapper<Good>(Good.class), params.toArray());
     }
 
+    // 通过商品ID获取商品名
     @Override
     public String getNameById(String goodId) {
         String sql = "select goodName from tb_good where goodId=?";
@@ -215,6 +228,7 @@ public class GoodDaoImpl implements GoodDao {
         return template.queryForObject(sql, String.class, goodId);
     }
 
+    // 判断商品是否被使用
     @Override
     public boolean isUsed(String gid) {
         String sql = "select count(documentId) from tb_document_detail where goodId=?";
